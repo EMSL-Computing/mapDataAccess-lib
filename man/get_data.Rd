@@ -10,8 +10,6 @@ get_data(con, id, ...)
 \item{con}{\code{\link{map_data_connection}} object}
 
 \item{id}{data object ID, typically returned by \code{\link{put_data}}}
-
-\item{...}{}
 }
 \value{
 R object stored at the specified ID

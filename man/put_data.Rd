@@ -10,8 +10,6 @@ put_data(con, data, ...)
 \item{con}{\code{\link{map_data_connection}} object}
 
 \item{data}{any R data object}
-
-\item{...}{}
 }
 \value{
 UUID that can be used for retrieving the data (see \code{\link{get_data}})

@@ -10,8 +10,6 @@ put_file(con, filename, ...)
 \item{con}{\code{\link{map_data_connection}} object}
 
 \item{filename}{path to file}
-
-\item{...}{}
 }
 \value{
 UUIDthat can be used for retrieving the file (see \code{\link{get_file}})

@@ -2,7 +2,6 @@
 #'
 #' @param con \code{\link{map_data_connection}} object
 #' @param data any R data object
-#' @param ... 
 #'
 #' @return UUID that can be used for retrieving the data (see \code{\link{get_data}})
 #' @seealso \code{\link{get_data}}, \code{\link{map_data_connection}}

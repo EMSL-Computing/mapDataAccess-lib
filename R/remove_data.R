@@ -1,8 +1,7 @@
 #' Remove data object from a map_data_connection object using a UUID 
 #'
 #' @param con \code{\link{map_data_connection}} object
-#' @param id ID returned by \code{\link{put_data} or \code{\link{put_file}}
-#' @param ... 
+#' @param id ID returned by \code{\link{put_data}} or \code{\link{put_file}}
 #'
 #' @return TRUE or FALSE indicating success
 #' @export
