@@ -9,7 +9,7 @@ remove_data(con, id, ...)
 \arguments{
 \item{con}{\code{\link{map_data_connection}} object}
 
-\item{...}{}
+\item{id}{ID returned by \code{\link{put_data}} or \code{\link{put_file}}}
 }
 \value{
 TRUE or FALSE indicating success

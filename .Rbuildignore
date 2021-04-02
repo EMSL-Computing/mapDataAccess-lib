@@ -1,0 +1,6 @@
+venv
+.gitignore
+.Rbuildignore
+.github-ci.yml
+^doc$
+^Meta$

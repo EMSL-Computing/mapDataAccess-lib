@@ -2,7 +2,6 @@
 #'
 #' @param con \code{\link{map_data_connection}} object
 #' @param id file object ID, typically returned by \code{\link{put_file}}
-#' @param ... 
 #'
 #' @return path to local file copy (generated with \code{\link{tempfile}} function)
 #' @seealso \code{\link{put_file}}, \code{\link{map_data_connection}}

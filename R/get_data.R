@@ -2,7 +2,6 @@
 #'
 #' @param con \code{\link{map_data_connection}} object
 #' @param id data object ID, typically returned by \code{\link{put_data}}
-#' @param ... 
 #'
 #' @return R object stored at the specified ID
 #' @seealso \code{\link{put_data}}, \code{\link{map_data_connection}}

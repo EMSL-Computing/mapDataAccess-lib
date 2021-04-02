@@ -2,7 +2,12 @@
 title: "Using mapDataAccess with Min.io"
 author: "Amanda White"
 date: "2/8/2021"
-output: html_document
+#output: html_document
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using mapDataAccess with Min.io}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}

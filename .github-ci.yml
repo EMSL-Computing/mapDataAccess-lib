@@ -1,0 +1,36 @@
+image: rocker/tidyverse:latest
+
+
+stages:
+  - build
+  - document
+  - test
+  - deploy
+
+variables:
+  _R_CHECK_CRAN_INCOMING_: "false"
+  _R_CHECK_FORCE_SUGGESTS_: "true"
+
+before_script:
+  - apt-get update
+  - r -e 'devtools::install_deps()'
+
+build:
+  stage: build
+  script:
+    - r -e 'devtools::build()'
+
+documentation:
+  stage: document
+  script:
+    - r -e 'devtools::document()'
+
+check:
+  stage: test
+  script:
+    - r -e 'devtools::check(error_on="error")'
+
+install:
+  stage: deploy
+  script:
+    - r -e 'devtools::install()'
