@@ -1,10 +1,5 @@
 image: rocker/tidyverse:latest
 
-tags:
-- k8s
-- rzr
-- codebuilds
-
 stages:
   - build
   - document
@@ -20,21 +15,37 @@ before_script:
   - r -e 'devtools::install_deps()'
 
 build:
+  tags:
+    - k8s
+    - rzr
+    - codebuilds
   stage: build
   script:
     - r -e 'devtools::build()'
 
 documentation:
+  tags:
+    - k8s
+    - rzr
+    - codebuilds
   stage: document
   script:
     - r -e 'devtools::document()'
 
 check:
+  tags:
+    - k8s
+    - rzr
+    - codebuilds
   stage: test
   script:
     - r -e 'devtools::check(error_on="error")'
 
 install:
+  tags:
+    - k8s
+    - rzr
+    - codebuilds
   stage: deploy
   script:
     - r -e 'devtools::install()'
