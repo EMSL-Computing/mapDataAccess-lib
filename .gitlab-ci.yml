@@ -1,5 +1,9 @@
 image: rocker/tidyverse:latest
 
+tags:
+- k8s
+- rzr
+- codebuilds
 
 stages:
   - build
