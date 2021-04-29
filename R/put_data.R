@@ -24,6 +24,7 @@ put_data.map_minio_connection <- function(con, data, id=NA, ...) {
 
   io <- reticulate::import("io")
   bytes <-serialize(data, connection=NULL)
+  
   result <- con$client$put_object(bucket_name=con$bucket,object_name=id, 
                                data=io$BytesIO(bytes), length=length(bytes))
 
