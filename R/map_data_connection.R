@@ -23,6 +23,7 @@
 #' iris2 <- get_data(con, id)
 #' identical(iris, iris2)
 #' }
+#' @rdname map_data_connection
 map_data_connection <- function(config_file=NA) {
   if (is.na(config_file)) {
     # configure from environment variables

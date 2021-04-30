@@ -2,7 +2,6 @@
 #'
 #' @param con \code{\link{map_data_connection}} object
 #' @param data any R data object
-#' @param ... 
 #'
 #' @return UUID that can be used for retrieving the data (see \code{\link{get_data}})
 #' @seealso \code{\link{get_data}}, \code{\link{map_data_connection}}
@@ -25,6 +24,7 @@ put_data.map_minio_connection <- function(con, data, id=NA, ...) {
 
   io <- reticulate::import("io")
   bytes <-serialize(data, connection=NULL)
+  
   result <- con$client$put_object(bucket_name=con$bucket,object_name=id, 
                                data=io$BytesIO(bytes), length=length(bytes))
 

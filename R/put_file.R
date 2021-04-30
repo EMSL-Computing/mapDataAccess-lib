@@ -2,7 +2,6 @@
 #'
 #' @param con \code{\link{map_data_connection}} object
 #' @param filename path to file
-#' @param ... 
 #'
 #' @return UUIDthat can be used for retrieving the file (see \code{\link{get_file}})
 #' @seealso \code{\link{get_file}}, \code{\link{map_data_connection}}

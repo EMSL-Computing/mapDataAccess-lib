@@ -10,8 +10,6 @@ get_file(con, id, filename, ...)
 \item{con}{\code{\link{map_data_connection}} object}
 
 \item{id}{file object ID, typically returned by \code{\link{put_file}}}
-
-\item{...}{}
 }
 \value{
 path to local file copy (generated with \code{\link{tempfile}} function)

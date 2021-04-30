@@ -1,8 +1,8 @@
 #' @export
-print.map_data_connection <- function(obj) {
-  cat(paste0("type: ", class(obj)[1], "\n"))
-  for (k in names(obj)) {
-    cat(paste0(k, ": ", obj[[k]], "\n"))
+print.map_data_connection <- function(x, ...) {
+  cat(paste0("type: ", class(x)[1], "\n"))
+  for (k in names(x)) {
+    cat(paste0(k, ": ", x[[k]], "\n"))
   }
   invisible()
 }
