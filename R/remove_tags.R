@@ -8,15 +8,15 @@
 #' @return nothing
 #' @seealso \code{\link{get_tags}}, \code{\link{set_tags}}
 #' @export
-delete_tags <- function(con, id) UseMethod("delete_tags")
+remove_tags <- function(con, id) UseMethod("remove_tags")
 
 #' @export
-delete_tags.map_dir_connection <- function(con, id) {
-  stop("'delete_tags' is not implemented for directory connections")
+remove_tags.map_dir_connection <- function(con, id) {
+  stop("'remove_tags' is not implemented for directory connections")
 }
 
 #' @export 
-delete_tags.map_minio_connection <- function(con, id) {
+remove_tags.map_minio_connection <- function(con, id) {
   con$client$delete_object_tags(bucket_name=con$bucket,object_name=id)
   invisible()
 }
