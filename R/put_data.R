@@ -25,9 +25,14 @@ put_data.map_minio_connection <- function(con, data, id=NA, ...) {
   io <- reticulate::import("io")
   bytes <-serialize(data, connection=NULL)
   
-  result <- con$client$put_object(bucket_name=con$bucket,object_name=id, 
+  internal_id <- id
+  if (!is.null(con$directory)) {
+    internal_id <- paste(con$directory, id, sep="/")
+  }
+  
+  result <- con$client$put_object(bucket_name=con$bucket,object_name=internal_id, 
                                data=io$BytesIO(bytes), length=length(bytes))
 
-  if (con$verbose) message(sprintf("Writing object to %s/%s", con$bucket, id))
+  if (con$verbose) message(sprintf("Writing object to %s/%s", con$bucket, internal_id))
   return(id)
 }

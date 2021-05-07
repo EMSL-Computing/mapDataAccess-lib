@@ -18,6 +18,10 @@ get_tags.map_dir_connection <- function(con, id) {
   
 #' @export 
 get_tags.map_minio_connection <- function(con, id) {
+  if (!is.null(con$directory)) {
+    id <- paste(con$directory, id, sep="/")
+  }
+  if (con$verbose) message(sprintf("Getting tags for object %s/%s", con$bucket, id))
   tag_obj <- con$client$get_object_tags(bucket_name=con$bucket,
                                         object_name=id)
   result <- list()

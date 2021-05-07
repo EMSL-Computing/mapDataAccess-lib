@@ -23,9 +23,14 @@ put_file.map_minio_connection <- function(con, filename, id=NA, ...) {
   if (is.na(id)) 
     id <- get_unique_id(con)
 
-  if (con$verbose) message(sprintf("Writing file to %s/%s", con$bucket, id))
+  internal_id <- id
+  if (!is.null(con$directory)) {
+    internal_id <- paste(con$directory, id, sep="/")
+  }
+  
+  if (con$verbose) message(sprintf("Writing file to %s/%s", con$bucket, internal_id))
   if (!file.exists(filename)) stop(sprintf("File does not exist: '%s'", filename))
-  result <- con$client$fput_object(bucket_name=con$bucket,object_name=id, 
+  result <- con$client$fput_object(bucket_name=con$bucket,object_name=internal_id, 
                                file_path=filename)
 
   return(id)

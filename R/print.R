@@ -2,7 +2,7 @@
 print.map_data_connection <- function(x, ...) {
   cat(paste0("type: ", class(x)[1], "\n"))
   for (k in names(x)) {
-    cat(paste0(k, ": ", x[[k]], "\n"))
+    cat(paste0(k, ": ", as.character(x[[k]]), "\n"))
   }
   invisible()
 }
@@ -10,6 +10,6 @@ print.map_data_connection <- function(x, ...) {
 #' @export
 toString.map_data_connection <- function(x, ...) {
   s <- paste0("{type=", class(x)[1], "; ")
-  s <- paste0(s, paste0(names(x), "=", unlist(x), collapse="; "), "}")
+  s <- paste0(s, paste0(names(x), "=", as.character(unlist(x)), collapse="; "), "}")
   return(s)
 }
