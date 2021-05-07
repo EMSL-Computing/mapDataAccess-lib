@@ -21,9 +21,14 @@ get_data.map_dir_connection <- function(con, id, ...) {
 
 #' @export
 get_data.map_minio_connection <- function(con, id, ...) {
+  if (!is.null(con$directory)) {
+    id <- paste(con$directory, id, sep="/")
+  }
+
   if (con$verbose) message(sprintf("Reading %s/%s", con$bucket, id))
   io <- reticulate::import("io")
   #this will return a urllib3.response.HTTPResponse object
+  
   result4 <- con$client$get_object(bucket_name=con$bucket, object_name=id)
   len <- as.integer(result4$getheader('Content-Length'))
   bytearray <- reticulate::r_to_py(raw(len))

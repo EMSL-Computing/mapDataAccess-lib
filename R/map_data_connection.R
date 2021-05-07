@@ -62,6 +62,11 @@ map_dir_connection <- function(config_file=NA) {
   # transform secure and verbose into boolean
   verbose <- str_to_bool(verbose, default=FALSE)
   
+  username <- get_env_variable("SHINYPROXY_USERNAME", can_be_empty = TRUE)
+  if (nchar(username) > 0) {
+    dirname <- file.path(dirname, make.names(username))
+  }
+  
   if (!dir.exists(dirname)) {
     if (verbose) message(sprintf("Creating directory '%s'", dirname))
     dir.create(dirname, recursive = TRUE)
@@ -100,6 +105,13 @@ map_minio_connection <- function(config_file=NA) {
   # connect to minio
   reticulate::use_virtualenv(python_venv, required=TRUE)
   
+  username <- get_env_variable("SHINYPROXY_USERNAME", can_be_empty = TRUE)
+  if (nchar(username) > 0) {
+    username <- make.names(username)
+  } else {
+    username <- NULL
+  }
+  
   minio <- reticulate::import('minio')
   tryCatch({
       client <- minio$Minio(endpoint, access_key=access_key, secret_key=secret_key, secure=secure)
@@ -110,7 +122,7 @@ map_minio_connection <- function(config_file=NA) {
   
   result <- structure(list(client=client, endpoint=endpoint, access_key=access_key, 
                            secret_key=secret_key, bucket=bucket, secure=secure, 
-                           region=region, verbose=verbose), 
+                           region=region, verbose=verbose, directory=username), 
                    class = c("map_minio_connection", "map_data_connection"))
   if (verbose) message(toString(result))
   return(result)

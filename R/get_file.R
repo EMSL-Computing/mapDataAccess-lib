@@ -22,6 +22,10 @@ get_file.map_dir_connection <- function(con, id, ...) {
 
 #' @export
 get_file.map_minio_connection <- function(con, id, filename, ...) {
+  if (!is.null(con$directory)) {
+    id <- paste(con$directory, id, sep="/")
+  }
+  
   if (con$verbose) message(sprintf("Retrieving %s/%s", con$bucket, id))
   
   dest_path <- tempfile()

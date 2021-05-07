@@ -15,7 +15,11 @@ get_unique_id.map_dir_connection <- function(con, ...) {
 get_unique_id.map_minio_connection <- function(con, ...) {
   id <- uuid::UUIDgenerate()
   # make sure it's unique
-  while (id %in% reticulate::iterate(con$client$list_objects(con$bucket), function(x) x$object_name)) {
+  curr_ids = reticulate::iterate(
+    con$client$list_objects(con$bucket, prefix=con$directory, recursive=TRUE), 
+    function(x) x$object_name)
+  
+  while (any(endsWith(curr_ids, id))) {
     id <- uuid::UUIDgenerate()
   }
   return(id)

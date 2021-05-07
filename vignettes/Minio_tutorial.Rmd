@@ -1,7 +1,7 @@
 ---
 title: "Using mapDataAccess with Min.io"
 author: "Amanda White"
-date: "2/8/2021"
+date: "4/30/2021"
 #output: html_document
 output: rmarkdown::html_vignette
 vignette: >
@@ -28,11 +28,11 @@ You can see the Min.io UI by opening http://localhost:9000.
 
 ## Setting up the `mapDataAccess` Package
 
-The `mapDataAccess` package is on the mapDataAccess branch of the Github repo at https://github.com/lmbramer/MOAP. Install the package using:
+The `mapDataAccess` package is on EMSL's GitLab server at https://code.emsl.pnl.gov/multiomics-analyses/mapdataaccess-lib. Install the package using:
 
 ```{r eval=FALSE}
-remotes::install_github("https://github.com/lmbramer/MOAP", ref="mapDataAccess", 
-                        subdir="mapDataAccess", auth_token=[insert_your_github_auth_token])
+remotes::install_gitlab("https://code.emsl.pnl.gov/multiomics-analyses/mapdataaccess-lib", 
+                        subdir="mapDataAccess", auth_token=[insert_your_gitlab_auth_token])
 ```
 
 After installing the package you'll need to set up a local Python virtual environment and install the `minio` Python package. You need Python 3 (at least 3.6). Unfortunately, there's a bug in `minio` 7.0.1 affecting tags (but it's already fixed in the Github code). So until 7.0.2 is deployed to the pip servers we'll need to check out the code and install it from source.
@@ -115,8 +115,35 @@ The `remove_data` method will delete the data object in storage. (This works the
 remove_data(con, id)
 ```
 
+### Tags
+Min.io has the ability to store and retrieve file tags, and so `mapDataAccess` provides the `set_tags`, `get_tags` and `remove_tags` to manage tag storage. Tags are stored as a named list of key/value pairs as shown below.
+
+```{r eval=FALSE}
+t <- list(key1="value1", key2="value2")
+set_tags(con, id, tags)
+```
+
+When tags are retrieved, they are not guaranteed to be in the same order as when they are set, so it's important to access the tags list by name rather than index.
+
+```{r eval=FALSE}
+t2 <- get_tags(con, id)
+```
+
+The `set_tags` operation is replacing all existing tags with those provided, it is not *adding* tags. To add a tag to an existing set, retrieve the tags, add new tags and then set the tags with the entire list:
+
+```{r eval=FALSE}
+t3 <- get_tags(con, id)
+t3[["key3"]] <- "value3"
+set_tags(con, id, t3)
+```
+
+The `remove_tags` function will delete all tags associated with an ID:
+
+```{r eval=FALSE}
+remove_tags(con, id)
+```
+
 ### Future Additions
 Potential future features to add:
 
-* Min.io provides a mechanism to save/restore tags related to files in storage. This might be useful to save the tags the MAP front end generates when data is uploaded.
 * Min.io has the ability to set policies to delete data after so much time has passed, but that is currently not utilized in the R code.
