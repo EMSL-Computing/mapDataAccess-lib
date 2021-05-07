@@ -18,7 +18,7 @@ get_unique_id.map_minio_connection <- function(con, ...) {
   curr_ids = reticulate::iterate(
     con$client$list_objects(con$bucket, prefix=con$directory, recursive=TRUE), 
     function(x) x$object_name)
-  if (len(curr_ids) == 0) return(id)
+  if (length(curr_ids) == 0) return(id)
   while (any(endsWith(curr_ids, id))) {
     id <- uuid::UUIDgenerate()
   }
