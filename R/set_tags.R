@@ -26,6 +26,11 @@ set_tags.map_minio_connection <- function(con, id, tags) {
   tag_obj = minio$tagging$Tags$new_object_tags()
   tag_obj$update(tags)
 
+  if (!is.null(con$directory)) {
+    id <- paste(con$directory, id, sep="/")
+  }
+  
+  if (con$verbose) message(sprintf("Writing tags to %s/%s", con$bucket, id))
   con$client$set_object_tags(bucket_name=con$bucket,object_name=id, 
                                 tags=tag_obj)
   

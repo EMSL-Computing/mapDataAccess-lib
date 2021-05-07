@@ -17,6 +17,10 @@ remove_data.map_dir_connection <- function(con, id, ...) {
 
 #' @export
 remove_data.map_minio_connection <- function(con, id, ...) {
+  if (!is.null(con$directory)) {
+    id <- paste(con$directory, id, sep="/")
+  }
+  if (con$verbose) message(sprintf("Removing object %s/%s", con$bucket, id))
   con$client$remove_object(con$bucket, id)
   return(TRUE)
 }
