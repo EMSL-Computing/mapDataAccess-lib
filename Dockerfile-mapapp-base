@@ -25,18 +25,16 @@ RUN apt-get update && apt-get install -y \
 # RUN Rscript "Install_MAP_Packages.R"
 
 # Install MAP-app dependencies
-RUN Rscript -e 'install.packages(c("shiny", "shinydashboard", "shinydashboardPlus", "shinyWidgets", "DiagrammeR", "DT", "dplyr", "data.table", "purrr", "tidyr", "devtools", "reticulate", "yaml", "waiter", "lifecycle", "fresh", "htmltools", "uuid"))'
+RUN Rscript -e 'install.packages(c("shiny", "shinydashboard", "shinydashboardPlus", "shinyWidgets", "DiagrammeR", "DT", "dplyr", "data.table", "purrr", "tidyr", "devtools", "reticulate", "yaml", "waiter", "lifecycle", "fresh", "htmltools", "uuid"), repos="https://cran.rstudio.com")'
 
 # Install shinydashboardPlus version that does not error out. 
 RUN Rscript -e "devtools::install_github('RinteRface/shinydashboardPlus@v0.7.5', dependencies = TRUE, repos = 'https://cran.rstudio.com')"
 
 # Set up python virtual env and install mapDataAccess Python dependencies
-COPY requirements.txt .
 RUN python3 -m venv venv
 RUN venv/bin/pip install --upgrade pip --trusted-host=pypi.org --trusted-host=files.pythonhosted.org 
-RUN venv/bin/pip install -r requirements.txt --trusted-host=pypi.org --trusted-host=files.pythonhosted.org  
+RUN venv/bin/pip install minio --trusted-host=pypi.org --trusted-host=files.pythonhosted.org  
 
 # Install mapDataAccess R package 
-COPY mapDataAccess /tmp/mapDataAccess
+COPY mapdataaccess-lib /tmp/mapDataAccess
 RUN Rscript -e "devtools::install_local('/tmp/mapDataAccess', repos='https://cran.rstudio.com')"
-

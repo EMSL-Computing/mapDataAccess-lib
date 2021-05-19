@@ -1,10 +1,10 @@
 image: rocker/tidyverse:latest
 
 stages:
-  - build
-  - document
-  - test
-  - deploy
+#  - build
+#  - document
+#  - test
+#  - deploy
   - mapapp-base
 
 include:
