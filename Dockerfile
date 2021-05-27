@@ -1,4 +1,4 @@
-## MODE trelliscope service, called from MODE shiny app
+## MODE trelliscope service, called from MODE shiny app.
 
 FROM code-registry.emsl.pnl.gov/multiomics-analyses/rworker-docker:0.0.3
 
