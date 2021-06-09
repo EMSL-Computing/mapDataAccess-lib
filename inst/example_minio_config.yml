@@ -1,8 +1,0 @@
-type: minio
-endpoint: localhost:9000
-access_key: minioadmin
-secret_key: minioadmin
-bucket: map
-secure: False
-python_venv: /Users/d3l348/Files/MOAP/R/MOAP/mapDataAccess/venv
-verbose: true
