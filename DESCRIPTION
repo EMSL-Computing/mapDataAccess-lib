@@ -1,0 +1,22 @@
+Package: mapDataAccess
+Title: Unified data access and sharing API for the MAP suite of tools
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Amanda",
+           family = "White",
+           role = c("aut", "cre"),
+           email = "amanda.white@pnnl.gov")
+Description: Unified data access and sharing API for the MAP suite of tools.
+License: license.txt
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    uuid,
+    yaml,
+    reticulate
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
