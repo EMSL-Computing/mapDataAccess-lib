@@ -10,6 +10,8 @@ print.map_data_connection <- function(x, ...) {
 #' @export
 toString.map_data_connection <- function(x, ...) {
   s <- paste0("{type=", class(x)[1], "; ")
-  s <- paste0(s, paste0(names(x), "=", as.character(unlist(x)), collapse="; "), "}")
+  vals <- as.character(unlist(x))
+  vals[names(x) %in% c("secret_key", "password")] <- "**********"
+  s <- paste0(s, paste0(names(x), "=", vals, collapse="; "), "}")
   return(s)
 }

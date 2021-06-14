@@ -1,6 +1,6 @@
 Package: mapDataAccess
 Title: Unified data access and sharing API for the MAP suite of tools
-Version: 0.0.0.9000
+Version: 0.0.0.10
 Authors@R: 
     person(given = "Amanda",
            family = "White",
