@@ -4,5 +4,5 @@ access_key: minioadmin
 secret_key: minioadmin
 bucket: map
 secure: False
-python_venv: /Users/d3l348/Files/MOAP/R/MOAP/mapDataAccess/venv
+python_venv: /Users/d3l348/Files/MOAP/R/mapdataaccess-lib/venv
 verbose: true
