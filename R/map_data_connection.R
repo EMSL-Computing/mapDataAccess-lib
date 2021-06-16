@@ -103,7 +103,26 @@ map_minio_connection <- function(config_file=NA) {
   verbose <- str_to_bool(verbose, default=FALSE)
   
   # connect to minio
-  reticulate::use_virtualenv(python_venv, required=TRUE)
+  
+  # check if the specified environment is a conda environment
+  conda_envs <- tryCatch(
+    {
+      reticulate::conda_list()$python
+    },
+    error = function(e) {
+      NULL
+    }
+  )
+  
+  is_conda <- any(sapply(conda_envs, function(envpath) {
+    grepl(sprintf("^%s", normalizePath(python_venv)), envpath)
+  }))
+  
+  if (is_conda) {
+    reticulate::use_condaenv(python_venv, required = TRUE)
+  } else {
+    reticulate::use_virtualenv(python_venv, required = TRUE)
+  }
   
   username <- get_env_variable("SHINYPROXY_USERNAME", can_be_empty = TRUE)
   if (nchar(username) > 0) {
