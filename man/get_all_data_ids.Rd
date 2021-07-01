@@ -4,10 +4,16 @@
 \alias{get_all_data_ids}
 \title{Get all existing object IDs}
 \usage{
-get_all_data_ids(con, ...)
+get_all_data_ids(con, filter_tags = NULL, ...)
 }
 \arguments{
 \item{con}{\code{\link{map_data_connection}} object}
+
+\item{filter_tags}{(optional) Either a character vector or a named list/vector
+with character elements.  If named, will return every object id with at least
+one tag value that matches the corresponding value in the named list.
+If unnamed, object ids with at least one tag key in filter_tags will be
+returned.}
 }
 \value{
 a character vector of IDs of existing data
