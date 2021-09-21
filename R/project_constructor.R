@@ -157,6 +157,86 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
   
 }
 
-## TODO: project ipmart objects. 
+#' Generate a project object to pass data from MAP to ipmart
+#' 
+#' @description Constructs a project ipmart object from pmart projects and midpoints.
+#' 
+#' @param objects List of pmart projects or midpoints at the same tab (normalization or statistics).
+#'    Must contain 2-5 objects. There can be
+#'    no more than 2 metabolomics (1 of: NMR or GC/LC-MS), 
+#'    no more than 2 lipidomics datasets, 
+#'    and no more than 1 proteomics (peptide or protein) dataset. Required. 
+#'
+#' @return A project ipmart object
+#' @examples 
+#' \dontrun{
+#' 
+#' library(pmartRdata)
+#' 
+#' # Generate midpoint with the example in midpoint_pmart and save result as "midpoint"
+#' 
+#' # Make a metabolomics GC/LC MS project
+#' metab_project <- project_pmart(projectname = "My Metab Data",
+#'                                datatype = "Metabolomics-GC/LC-MS",
+#'                                edata = pmartRdata::metab_edata,
+#'                                fdata = pmartRdata::metab_fdata,
+#'                                edata_filename = "metab_edata",
+#'                                fdata_filename = "metab_fdata")
+#'                                
+#' # Make a metabolomics NMR project
+#' nmr_project <- project_pmart(projectname = "My NMR Data",
+#'                                datatype = "Metabolomics-NMR",
+#'                                edata = pmartRdata::nmr_edata_identified,
+#'                                fdata = pmartRdata::nmr_fdata_identified,
+#'                                emeta = pmartRdata::nmr_emeta_identified,
+#'                                edata_filename = "nmr_edata",
+#'                                fdata_filename = "nmr_fdata",
+#'                                emeta_filename = "nmr_emeta")
+#'                           
+#'                                                     
+#' # Make a lipidomics project
+#' lipid_project <- project_pmart(projectname = "My Lipid Data",
+#'                                datatype = "Lipidomics-Positive",
+#'                                edata = pmartRdata::lipid_edata,
+#'                                fdata = pmartRdata::lipid_fdata,
+#'                                edata_filename = "lipid_edata",
+#'                                fdata_filename = "lipid_fdata")
+#'                           
+#' # Finally, make the ipmart midpoint object
+#' project_ipmart(objects = list(midpoint, metab_project, nmr_project, lipid_project))                          
+#' 
+#' }
+#' @export
+project_ipmart <- function(objects) {
+  
+  # Check the length of the object. It must be between 2 and 5.
+  if (length(objects) > 1 & length(objects) < 6) {
+    stop("objects must have at least 2 objects and no more than 6.")
+  }
+  
+  # All objects must have pmart in them
+  if ((grepl("pmart", lapply(objects, class) %>% unlist()) %>% all()) == FALSE) {
+    stop("objects must all be pmart projects or midpoints.")
+  }
+  
+  # Get project types 
+  ProjectTypes <- lapply(objects, function(object) {
+    
+    # Extract the object type
+    if (class(object) == "midpoint pmart") {
+      DataType <- object$Tracking$`Original Files`$Project$DataType
+    } else if (class(object) == "project pmart") {
+      DataType <- object$Project$DataType
+    }
+    
+    # Simplify data type to metabolomics/lipidomics/proteomics
+    if (grepl("Peptide|Protein", DataType)) {return("Proteomics")} else
+    if (grepl("Lipidomics", DataType)) {return("Lipidomics")} else {return(DataType)}
+    
+  }) %>% unlist()
+  
+  
+}
+
 
 
