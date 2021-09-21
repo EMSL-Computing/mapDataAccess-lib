@@ -1,4 +1,4 @@
-#' Send data object to a moap_data_connection object and get back a UUID
+#' Send data object to a map_data_connection object and get back a UUID
 #'
 #' @param con \code{\link{map_data_connection}} object
 #' @param data any R data object

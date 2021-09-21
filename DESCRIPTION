@@ -15,6 +15,7 @@ RoxygenNote: 7.1.1
 Imports: 
     uuid,
     yaml,
+    magrittr,
     reticulate
 Suggests: 
     knitr,
