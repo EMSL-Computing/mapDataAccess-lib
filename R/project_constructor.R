@@ -4,11 +4,8 @@
 #' @export
 .is_datatype <- function(datatype) {
   
-  # If Data Type is not a string, return FALSE
-  if (is.character(dataype) == FALSE) {
-    message("Data Type must be a string.")
-    return(FALSE)
-  }
+  # Make datatype a string
+  datatype <- as.character(datatype)
   
   # Data Type must be of the following classes
   return(datatype %in% c("Peptide-level Label Free","Peptide-level Isobaric",
@@ -27,14 +24,85 @@
 
 ## PROJECT OBJECT CONSTRUCTORS--------------------------------------------------
 
-
-
 #' Generate a project object to pass data from MAP to pmart
 #' 
-#' @details Constructs a pmart project object where e_data and f_data are required. 
+#' @description Constructs a pmart project object where edata and fdata are required. 
 #'     
-#' @param ProjectName Any string to name the project. All spaces and non-alphanumeric
+#' @param projectname Any string to name the project. All spaces and non-alphanumeric
 #'    characters will be removed to prevent issues with the visualizations. Required.
-#' @param 
+#' @param datatype Must be of the acceptable MAP omic class. See .is_datatype for list. Required. 
+#' @param edata Must be a dataframe or datatable. Required. 
+#' @param fdata Must be a dataframe or datatable. Required.
+#' @param emeta Must be a dataframe or datatable. Optional. 
+#' @param edata_name The path or name for the edata file. Optional. 
+#' @param fdata_name The path or name for the fdata file. Optional. 
+#' @param emeta_name The path or name for the emeta file. Optional. 
+#' 
+#' @return A pmart project object
+#' @examples 
+#' \dontrun{
+#' 
+#' library(pmartRdata)
+#' project_pmart(projectname = "My Peptide Data",
+#'              datatype = "Peptide-level Label Free",
+#'              edata = pmartRdata::pep_edata,
+#'              fdata = pmartRdata::pep_fdata,
+#'              emeta = pmartRdata::pep_emeta,
+#'              edata_filename = "pep_edata",
+#'              fdata_filename = "pep_fdata",
+#'              emeta_filename = "pep_emeta")
+#' 
+#' }
+#' @export
+project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
+                          edata_filename = NULL, fdata_filename = NULL, emeta_filename = NULL) {
+  
+  # Check data type
+  if (.is_datatype(datatype) == FALSE) {
+    stop("Data Type is not of the appropriate class.")
+  }
+  
+  # Check edata 
+  if (is_edata(edata) == FALSE) {
+    stop("edata was not recognized as a proper edata file.")
+  }
+  
+  # Check fdata 
+  if (is_fdata(edata, fdata) == FALSE) {
+    stop("fdata was not recognized as a proper fdata file.")
+  }
+  
+  # Check emeta (optional)
+  if (is.null(emeta) == FALSE) {
+    if (is_emeta(edata, emeta) == FALSE) {
+      stop("emeta was not recognized as a proper emeta file.")
+    }
+  }
+  
+  # Construct project object
+  ProjectObject <- list(
+    "Project" = list(
+      "Name" = .scrub_clean(projectname),
+      "DataType" = datatype 
+    ),
+    "Data" = list(
+      "e_data" = edata,
+      "e_data_filename" = edata_filename,
+      "f_data" = fdata,
+      "f_data_filename" = fdata_filename,
+      "e_meta" = emeta,
+      "e_meta_filename" = emeta_filename
+    )
+  )
+  
+  # Assign the class attribute
+  class(ProjectObject) <- "project pmart"
+  
+  # Return
+  return(ProjectObject)
+  
+}
+
+## TODO: ipmart project objects. 
 
 
