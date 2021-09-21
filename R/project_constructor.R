@@ -24,9 +24,63 @@
 
 ## PROJECT OBJECT CONSTRUCTORS--------------------------------------------------
 
+#' Generate a simple e_data only project that can only be opened in MODE
+#' 
+#' @description Construct a project edata object where only edata is required.
+#' 
+#' @param projectname Any string to name the project. All spaces and non-alphanumeric
+#'    characters will be removed to prevent issues with the visualizations. Required.
+#' @param datatype Must be of the acceptable MAP omic class. See .is_datatype for list. Required. 
+#' @param edata Must be a dataframe or datatable. Required. 
+#' @param edata_name The path or name for the edata file. Optional. 
+#' 
+#' @return A project edata object
+#' @examples 
+#' \dontrun{
+#' 
+#' library(pmartRdata)
+#' project_edata(projectname = "LipidToMode",
+#'              datatype = "Lipidomics-Positive",
+#'              edata = pmartRdata::lipid_edata,
+#'              edata_filename = "lip_edata")
+#' 
+#' }
+#' @export
+project_edata <- function(projectname, datatype, edata, edata_filename = NULL) {
+  
+  # Check data type
+  if (.is_datatype(datatype) == FALSE) {
+    stop("Data Type is not of the appropriate class.")
+  }
+  
+  # Check edata 
+  if (is_edata(edata) == FALSE) {
+    stop("edata was not recognized as a proper edata file.")
+  }
+  
+  # Construct project object
+  ProjectObject <- list(
+    "Project" = list(
+      "Name" = .scrub_clean(projectname),
+      "DataType" = datatype 
+    ),
+    "Data" = list(
+      "e_data" = edata,
+      "e_data_filename" = edata_filename
+    )
+  )
+  
+  # Assign the class attribute
+  class(ProjectObject) <- "project edata"
+  
+  # Return
+  return(ProjectObject)
+  
+}
+
 #' Generate a project object to pass data from MAP to pmart
 #' 
-#' @description Constructs a pmart project object where edata and fdata are required. 
+#' @description Constructs a project pmart object where edata and fdata are required. 
 #'     
 #' @param projectname Any string to name the project. All spaces and non-alphanumeric
 #'    characters will be removed to prevent issues with the visualizations. Required.
@@ -38,7 +92,7 @@
 #' @param fdata_name The path or name for the fdata file. Optional. 
 #' @param emeta_name The path or name for the emeta file. Optional. 
 #' 
-#' @return A pmart project object
+#' @return A project pmart object
 #' @examples 
 #' \dontrun{
 #' 
@@ -103,6 +157,6 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
   
 }
 
-## TODO: ipmart project objects. 
+## TODO: project ipmart objects. 
 
 

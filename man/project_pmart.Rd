@@ -34,10 +34,10 @@ characters will be removed to prevent issues with the visualizations. Required.}
 \item{emeta_name}{The path or name for the emeta file. Optional.}
 }
 \value{
-A pmart project object
+A project pmart object
 }
 \description{
-Constructs a pmart project object where edata and fdata are required.
+Constructs a project pmart object where edata and fdata are required.
 }
 \examples{
 \dontrun{

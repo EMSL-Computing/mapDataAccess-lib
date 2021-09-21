@@ -1,0 +1,117 @@
+#' Generate a midpoint analysis file for pmart
+#' 
+#' @description Possible "exit" points to generate a midpoint in pmart are
+#'    normalization, peptide statistics, peptide rollup, and statistics. 
+#'    
+#' @param omics_data An omicsData object as defined in pmartR. Required.
+#' @param tab The pmart tab the data was exported from. Acceptable entries are 
+#'    "normalization_tab", "peptide_statistics_tab", "protein_rollup_tab",
+#'    and "statistics_tab". Required. 
+#' @param project A project pmart object. Required. 
+#' @param omics_stats An omicsStats object as defined in pmartR. Optional. 
+#' @param omics_stats_pep A peptide omicsStats object as defined in pmartR. Optional. 
+#' 
+#' @return A midpoint pmart object
+#' @examples 
+#' \dontrun{
+#' 
+#' library(pmartRdata)
+#' 
+#' ## First, let's simulate getting to the normalization tab in pmart
+#' 
+#' # Load data
+#' myPepObject <- pmartRdata::pep_object
+#' 
+#' # Log transform data
+#' myPepObject <- edata_transform(myPepObject, "log2")
+#' 
+#' # Set group designation
+#' myPepObject <- group_designation(myPepObject, main_effects = "Condition")
+#' 
+#' # Apply filters
+#' myPepObject <- applyFilt(molecule_filter(myPepObject), myPepObject, min_num = 2)
+#' myPepObject <- applyFilt(rmd_filter(myPepObject), myPepObject, pvalue_threshold = 0.0001)
+#' 
+#' # Run Normalization
+#' myPepObject <- normalize_global(myPepObject, "all", "mean", apply_norm = TRUE)
+#' 
+#' ## Now, let's simulate exporting a midpoint file at this step 
+#' 
+#' midpoint_pmart(omics_data = myPepObject,
+#'                tab = "normalization_tab", 
+#'                project = project_pmart(projectname = "My Peptide Data",
+#'                                        datatype = "Peptide-level Label Free",
+#'                                        edata = pmartRdata::pep_edata,
+#'                                        fdata = pmartRdata::pep_fdata,
+#'                                        emeta = pmartRdata::pep_emeta,
+#'                                        edata_filename = "pep_edata",
+#'                                        fdata_filename = "pep_fdata",
+#'                                        emeta_filename = "pep_emeta")
+#'                )
+#' 
+#' }
+#' @export
+midpoint_pmart <- function(omics_data, tab, project, omics_stats = NULL, omics_stats_pep = NULL) {
+  
+  # Check omics_data is an omics data object
+  if (any(class(omics_data) %in% c("pepData", "proData", "metabData", "lipidData")) == FALSE) {
+    stop("omics_data must be of the pmartR class pepData, proData, metabData, or lipidData")
+  }
+  
+  # Tab must be of the correct class
+  tab <- as.character(tab)
+  if (tab %in% c("normalization_tab", "peptide_statistics_tab", "protein_rollup_tab", "statistics_tab") == FALSE) {
+    stop("tab name not recognized for pmart.")
+  }
+  
+  # Check that project is of the project pmart class
+  if (class(project) != "project pmart") {
+    stop("project must be a project pmart object.")
+  }
+  
+  # Check that omics_stats and omics_stats_pep are statRes objects
+  if (is.null(omics_stats_pep) == FALSE) {
+    if (class(omics_stats_pep) != "statRes") {
+      stop("omics_stats_pep must be a peptide statRes object from pmartR::imd_anova.")
+    }
+  }
+  if (is.null(omics_stats) == FALSE) {
+    if (class(omics_stats) != "statRes") {
+      stop("omics_stats must be a statRes object from pmartR::imd_anova.")
+    }
+  }
+  
+  # Statistics will only be added if that tab name is enabled
+  if (tab == "normalization_tab" & is.null(omics_stats_pep) == FALSE) {
+    message("omics_stats_pep ignored since the tab is normalization.")
+    omics_stats_pep <- NULL
+  }
+  if (tab != "statistics_tab" & is.null(omics_stats) == FALSE) {
+    message("omics_stats ignored since the tab is not statistics.")
+    omics_stats <- NULL
+  }
+  
+  # Construct MidPoint object
+  MidPoint <- list(
+    "Data Objects" =
+      list(
+        "OmicsData" = omics_data,
+        "OmicsStatsPep" = omics_stats_pep,
+        "OmicsStats" =  omics_stats
+      ),
+    "Tracking" = 
+      list(
+        "Timestamp" = Sys.time(),
+        "Tab" = tab,
+        "Original Files" = project
+      )
+  )
+  
+  # Assign the midpoint pmart class
+  class(MidPoint) <- "midpoint pmart"
+  
+  return(MidPoint)
+  
+}
+
+## TODO: ipmart midpoint file
