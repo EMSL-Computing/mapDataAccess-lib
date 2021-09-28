@@ -34,7 +34,7 @@ one unique universal identifier (UUID) would need to be passed to open an app wi
 
 * **midpoint_ipmart:** An object exported by ipmart. Contains 2-5 datasets processed through the Normalization, Statistics, and Integration tabs. Can be opened by ipmart or MODE.
 
-## project_edata
+## project edata
 
 ```{r}
 edataExample <- project_edata(projectname = "LipidToMode",
@@ -74,7 +74,7 @@ pull_tags_from_object(project_edata(projectname = "LipidToMode",
              edata_filename = "lip_edata")) %>% as.data.frame() %>% knitr::kable()
 ```
 
-## project_pmart
+## project pmart
 
 ```{r}
 pmart_example <- project_pmart(projectname = "My Peptide Data",
@@ -118,5 +118,69 @@ pull_tags_from_object(project_pmart(projectname = "My Peptide Data",
              emeta_filename = "pep_emeta")) %>% as.data.frame() %>% knitr::kable()
 ```
 
-## project_ipmart
+## project ipmart
+
+#### Inputs: project pmart
+
+```{r}
+# Make a metabolomics GC/LC MS project
+metab_project <- project_pmart(projectname = "My Metab Data",
+                               datatype = "Metabolomics-GC/LC-MS",
+                               edata = pmartRdata::metab_edata,
+                               fdata = pmartRdata::metab_fdata,
+                               edata_filename = "metab_edata",
+                               fdata_filename = "metab_fdata")
+                               
+# Make a metabolomics NMR project
+nmr_project <- project_pmart(projectname = "My NMR Data",
+                               datatype = "Metabolomics-NMR",
+                               edata = pmartRdata::nmr_edata_identified,
+                               fdata = pmartRdata::nmr_fdata_identified,
+                               emeta = pmartRdata::nmr_emeta_identified,
+                               edata_filename = "nmr_edata",
+                               fdata_filename = "nmr_fdata",
+                               emeta_filename = "nmr_emeta")
+                          
+                                                    
+# Make a lipidomics project
+lipid_project <- project_pmart(projectname = "My Lipid Data",
+                               datatype = "Lipidomics-Positive",
+                               edata = pmartRdata::lipid_edata,
+                               fdata = pmartRdata::lipid_fdata,
+                               edata_filename = "lipid_edata",
+                               fdata_filename = "lipid_fdata")
+                               
+# Make a proteomics project
+protein_project <- project_pmart(projectname = "My Protein Data",
+                                datatype = "Protein-level Label Free",
+                                edata = pmartRdata::pro_edata,
+                                fdata = pmartRdata::pro_fdata,
+                                edata_filename = "pro_edata",
+                                fdata_filename = "pro_fdata")
+
+
+ipmart_example <- project_ipmart(projectname = "projects", 
+                                 objects = list(metab_project, nmr_project, lipid_project, protein_project))
+class(ipmart_example) <- "list"
+ipmart_example$Project$DataType <- ipmart_example$Project$DataType %>% as.list()
+ipmart_example$Project$Name <- ipmart_example$Project$Name %>% as.list()
+ipmart_example %>% data.tree::as.Node(nodeName = "project_ipmart") %>% plot()
+```
+
+Above is an example of a project ipmart constructed from project pmart objects.The 
+data type names are extracted from the object's project which still contains a 
+name and data type. 
+
+**Tags:**
+
+```{r}
+pull_tags_from_object(project_ipmart(projectname = "projects", 
+   objects = list(metab_project, nmr_project, lipid_project, protein_project))) %>%
+  as.data.frame() %>% knitr::kable()
+```
+
+The DataType in this case is "project pmart" since the project ipmart is contained entirely
+of project pmart objects.
+
+#### Inputs: midpoint pmart
 
