@@ -159,13 +159,16 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
 
 #' Generate a project object to pass data from MAP to ipmart
 #' 
-#' @description Constructs a project ipmart object from pmart projects and midpoints.
+#' @description Constructs a project ipmart object from pmart projects and midpoints. Required. 
 #' 
-#' @param objects List of pmart projects or midpoints at the same tab (normalization or statistics).
-#'    Must contain 2-5 objects. There can be
-#'    no more than 2 metabolomics (1 of: NMR or GC/LC-MS), 
-#'    no more than 2 lipidomics datasets, 
+#' @param projectname Any string to name the project. All spaces and non-alphanumeric
+#'    characters will be removed to prevent issues with the visualizations. Required.
+#' @param objects List of all pmart projects or all pmart midpoints at the same tab (normalization or statistics).
+#'    Mixing of projects and midpoints is not allowed. Must contain 2-5 objects. There can be
+#'    no more than 2 metabolomics (1 of: NMR or GC/LC-MS), no more than 2 lipidomics datasets, 
 #'    and no more than 1 proteomics (peptide or protein) dataset. Required. 
+#' @param fmeta Must be a dataframe or data table. If not provided, users can built it in 
+#'    ipmart. Default is NULL. 
 #'
 #' @return A project ipmart object
 #' @examples 
@@ -173,7 +176,7 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
 #' 
 #' library(pmartRdata)
 #' 
-#' # Generate midpoint with the example in midpoint_pmart and save result as "midpoint"
+#' # Generate midpoint with the examples in midpoint_pmart and save result as "midpoint"
 #' 
 #' # Make a metabolomics GC/LC MS project
 #' metab_project <- project_pmart(projectname = "My Metab Data",
@@ -201,22 +204,42 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
 #'                                fdata = pmartRdata::lipid_fdata,
 #'                                edata_filename = "lipid_edata",
 #'                                fdata_filename = "lipid_fdata")
+#'                                
+#' # Make a proteomics project
+#' protein_project <- project_pmart(projectname = "My Protein Data",
+#'                                 datatype = "Protein-level Label Free",
+#'                                 edata = pmartRdata::pro_edata,
+#'                                 fdata = pmartRdata::pro_fdata,
+#'                                 edata_filename = "pro_edata",
+#'                                 fdata_filename = "pro_fdata")
 #'                           
 #' # Finally, make the ipmart midpoint object
-#' project_ipmart(objects = list(midpoint, metab_project, nmr_project, lipid_project))                          
+#' project_ipmart(projectname = "projects", objects = list(metab_project, nmr_project, lipid_project, protein_project))
+#' 
+#' # Or use the pmart_midpoint examples 
+#' project_ipmart(projectname = "midpoints", objects = list(pep_midpoint, lipid_midpoint))                          
 #' 
 #' }
 #' @export
-project_ipmart <- function(objects) {
+project_ipmart <- function(projectname, objects, fmeta = NULL) {
   
   # Check the length of the object. It must be between 2 and 5.
-  if (length(objects) > 1 & length(objects) < 6) {
-    stop("objects must have at least 2 objects and no more than 6.")
+  if (length(objects) < 2 | length(objects) > 5) {
+    stop("objects must be at least length 2, and no more than 5.")
   }
   
-  # All objects must have pmart in them
-  if ((grepl("pmart", lapply(objects, class) %>% unlist()) %>% all()) == FALSE) {
-    stop("objects must all be pmart projects or midpoints.")
+  ## TODO: Add fmeta check
+  
+  # Iterate through class information
+  get_classes <- lapply(objects, class) %>% unlist()
+  
+  # Make sure they are all pmart projects or midpoints
+  ProjectData <- grepl("project pmart", get_classes) %>% all()
+  MidpointData <- grepl("midpoint pmart", get_classes) %>% all()
+  
+  # If both are FALSE, trigger a warning
+  if (ProjectData == FALSE & MidpointData == FALSE) {
+    stop("objects must be either all project_pmart objects or midpoint_pmart objects.")
   }
   
   # Get project types 
@@ -231,10 +254,75 @@ project_ipmart <- function(objects) {
     
     # Simplify data type to metabolomics/lipidomics/proteomics
     if (grepl("Peptide|Protein", DataType)) {return("Proteomics")} else
-    if (grepl("Lipidomics", DataType)) {return("Lipidomics")} else {return(DataType)}
+      if (grepl("Lipidomics", DataType)) {return("Lipidomics")} else {return(DataType)}
     
-  }) %>% unlist()
+  }) %>% unlist() %>% table() %>% c()
   
+  # Ensure there is at most 1 peptide/proteomics, 2 lipidomics, 1 metabolommics GC/LC-MS, 1 metabolomics NMR
+  if ("Proteomics" %in% names(ProjectTypes) && ProjectTypes[["Proteomics"]] > 1) {
+    stop("ipmart cannot accept more than 1 proteomics (peptide or protein) dataset.")
+  }
+  if ("Lipidomics" %in% names(ProjectTypes) && ProjectTypes[["Lipidomics"]] > 2) {
+    stop("ipmart cannot accept more than 2 lipidomics datasets.")
+  }
+  if ("Metabolomics-GC/LC-MS" %in% names(ProjectTypes) && ProjectTypes[["Metabolomics-GC/LC-MS"]] > 1) {
+    stop("ipmart cannot accept more than 1 metabolomics GC/LC-MS dataset.")
+  }
+  if ("Metabolomics-NMR" %in% names(ProjectTypes) && ProjectTypes[["Metabolomics-NMR"]] > 1) {
+    stop("ipmart cannot accept more than 1 metabolomics NMR dataset.")
+  }
+  
+  # Load project objects
+  if (ProjectData) {
+    
+    # Name the objects by their data types
+    names(objects) <- lapply(objects, function(x) {x$Project$DataType}) %>% unlist()
+    
+    # All of the data is unprocessed. Generate the project object. 
+    ProjectObject <- list(
+      "Project" = list(
+        "Name" = .scrub_clean(projectname),
+        "DataType" = "project pmart"
+      ),
+      "Objects" = objects,
+      "fmeta" = fmeta
+    )
+    
+  } else if (MidpointData) {
+    
+    # Check that all the midpoints are from the same tab, with the exception of peptide data
+    SameTab <- (lapply(objects, function(x) {x$Tracking$Tab}) %>% 
+      unique() %>% length()) == 1    
+    
+    # If they're not all from the same tab, export warning
+    if (SameTab == FALSE) {
+      stop(paste0("pmart midpoints included in 'objects' must be exported from the same tab. ",
+        "The exported tabs are: ", paste(lapply(objects, function(x) {x$Tracking$Tab}) %>% unique()),
+        collapse = ", "))
+    } else {
+      
+      # Name the objects by their data types
+      names(objects) <- lapply(objects, function(x) {x$Tracking$`Original Files`$Project$DataType}) %>% unlist()
+      
+      # Build project object
+      ProjectObject <- list(
+        "Project" = list(
+          "Name" = .scrub_clean(projectname),
+          "DataType" = "midpoint pmart"
+        ),
+        "Objects" = objects,
+        "fmeta" = fmeta
+      )
+      
+    }
+    
+  }
+  
+  # Give the object its appropriate class
+  class(ProjectObject) <- "project ipmart"
+  
+  # Return result
+  return(ProjectObject)
   
 }
 

@@ -15,11 +15,12 @@
 #' @examples 
 #' \dontrun{
 #' 
+#' library(pmartR)
 #' library(pmartRdata)
 #' 
 #' ## First, let's simulate getting to the normalization tab in pmart
 #' 
-#' # Load data
+#' # Load peptide data
 #' myPepObject <- pmartRdata::pep_object
 #' 
 #' # Log transform data
@@ -37,7 +38,7 @@
 #' 
 #' ## Now, let's simulate exporting a midpoint file at this step 
 #' 
-#' midpoint_pmart(omics_data = myPepObject,
+#' pep_midpoint <- midpoint_pmart(omics_data = myPepObject,
 #'                tab = "normalization_tab", 
 #'                project = project_pmart(projectname = "My Peptide Data",
 #'                                        datatype = "Peptide-level Label Free",
@@ -48,6 +49,34 @@
 #'                                        fdata_filename = "pep_fdata",
 #'                                        emeta_filename = "pep_emeta")
 #'                )
+#'                
+#' # Load lipidomics data 
+#' myLipidObject <- pmartRdata::lipid_object
+#' 
+#' # Log transform data
+#' myLipidObject <- edata_transform(myLipidObject, "log2")
+#' 
+#' # Set group designation
+#' myLipidObject <- group_designation(myLipidObject, main_effects = "Condition")
+#' 
+#' # Apply filters
+#' myLipidObject <- applyFilt(rmd_filter(myLipidObject), myLipidObject, pvalue_threshold = 0.0001)
+#' 
+#' # Run Normalization
+#' myLipidObject <- normalize_global(myLipidObject, "all", "mean", apply_norm = TRUE)
+#' 
+#' lipid_midpoint <- midpoint_pmart(omics_data = myLipidObject,
+#'                   tab = "normalization_tab", 
+#'                   project = project_pmart(projectname = "My Lipid Data",
+#'                                           datatype = "Lipidomics-Positive",
+#'                                           edata = pmartRdata::lipid_edata,
+#'                                           fdata = pmartRdata::lipid_fdata,
+#'                                           emeta = NULL,
+#'                                           edata_filename = "pep_edata",
+#'                                           fdata_filename = "pep_fdata",
+#'                                           emeta_filename = NULL)
+#'                )
+#' 
 #' 
 #' }
 #' @export

@@ -4,25 +4,32 @@
 \alias{project_ipmart}
 \title{Generate a project object to pass data from MAP to ipmart}
 \usage{
-project_ipmart(objects)
+project_ipmart(projectname, objects, fmeta = NULL)
 }
 \arguments{
-\item{objects}{List of projects and midpoints. Must contain 2-5 objects. There can be
-no more than 2 metabolomics, no more than 2 lipidomics datasets, and no more than 1
-proteomics (peptide or protein) dataset. Required.}
+\item{projectname}{Any string to name the project. All spaces and non-alphanumeric
+characters will be removed to prevent issues with the visualizations. Required.}
+
+\item{objects}{List of all pmart projects or all pmart midpoints at the same tab (normalization or statistics).
+Mixing of projects and midpoints is not allowed. Must contain 2-5 objects. There can be
+no more than 2 metabolomics (1 of: NMR or GC/LC-MS), no more than 2 lipidomics datasets,
+and no more than 1 proteomics (peptide or protein) dataset. Required.}
+
+\item{fmeta}{Must be a dataframe or data table. If not provided, users can built it in
+ipmart. Default is NULL.}
 }
 \value{
 A project ipmart object
 }
 \description{
-Constructs a project ipmart object from pmart projects and midpoints.
+Constructs a project ipmart object from pmart projects and midpoints. Required.
 }
 \examples{
 \dontrun{
 
 library(pmartRdata)
 
-# Generate midpoint with the example in midpoint_pmart and save result as "midpoint"
+# Generate midpoint with the examples in midpoint_pmart and save result as "midpoint"
 
 # Make a metabolomics GC/LC MS project
 metab_project <- project_pmart(projectname = "My Metab Data",
@@ -50,9 +57,20 @@ lipid_project <- project_pmart(projectname = "My Lipid Data",
                                fdata = pmartRdata::lipid_fdata,
                                edata_filename = "lipid_edata",
                                fdata_filename = "lipid_fdata")
+                               
+# Make a proteomics project
+protein_project <- project_pmart(projectname = "My Protein Data",
+                                datatype = "Protein-level Label Free",
+                                edata = pmartRdata::pro_edata,
+                                fdata = pmartRdata::pro_fdata,
+                                edata_filename = "pro_edata",
+                                fdata_filename = "pro_fdata")
                           
 # Finally, make the ipmart midpoint object
-project_ipmart(objects <- list(midpoint, metab_project, nmr_project, lipid_project))                          
+project_ipmart(projectname = "projects", objects = list(metab_project, nmr_project, lipid_project, protein_project))
+
+# Or use the pmart_midpoint examples 
+project_ipmart(projectname = "midpoints", objects = list(pep_midpoint, lipid_midpoint))                          
 
 }
 }
