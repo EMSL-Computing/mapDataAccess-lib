@@ -72,8 +72,8 @@
 #'                                           edata = pmartRdata::lipid_edata,
 #'                                           fdata = pmartRdata::lipid_fdata,
 #'                                           emeta = NULL,
-#'                                           edata_filename = "pep_edata",
-#'                                           fdata_filename = "pep_fdata",
+#'                                           edata_filename = "lipid_edata",
+#'                                           fdata_filename = "lipid_fdata",
 #'                                           emeta_filename = NULL)
 #'                )
 #' 

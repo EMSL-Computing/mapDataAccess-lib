@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-library(mapDataAccess); library(data.tree)
+library(mapDataAccess); library(data.tree); library(pmartR)
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
@@ -45,7 +45,7 @@ class(edataExample) <- "list"
 edataExample$Project$DataType <- edataExample$Project$DataType %>% as.list()
 edataExample$Project$Name <- edataExample$Project$Name %>% as.list()
 edataExample$Data$e_data_filename <- edataExample$Data$e_data_filename %>% as.list()
-edataExample %>% data.tree::as.Node(nodeName = "project_edata") %>% plot()
+edataExample %>% data.tree::as.Node(nodeName = "project edata") %>% plot()
 ```
 
 **Components:**
@@ -71,7 +71,7 @@ quickly extract data about what has been uploaded.
 pull_tags_from_object(project_edata(projectname = "LipidToMode",
              datatype = "Lipidomics-Positive",
              edata = pmartRdata::lipid_edata,
-             edata_filename = "lip_edata")) %>% as.data.frame() %>% knitr::kable()
+             edata_filename = "lip_edata")) %>% as.data.frame() # %>% knitr::kable()
 ```
 
 ## project pmart
@@ -88,7 +88,7 @@ pmart_example <- project_pmart(projectname = "My Peptide Data",
 class(pmart_example) <- "list"
 pmart_example$Project$DataType <- pmart_example$Project$DataType %>% as.list()
 pmart_example$Project$Name <- pmart_example$Project$Name %>% as.list()
-pmart_example %>% data.tree::as.Node(nodeName = "project_pmart") %>% plot()
+pmart_example %>% data.tree::as.Node(nodeName = "project pmart") %>% plot()
 ```
 
 **Components:**
@@ -115,7 +115,7 @@ pull_tags_from_object(project_pmart(projectname = "My Peptide Data",
              emeta = pmartRdata::pep_emeta,
              edata_filename = "pep_edata",
              fdata_filename = "pep_fdata",
-             emeta_filename = "pep_emeta")) %>% as.data.frame() %>% knitr::kable()
+             emeta_filename = "pep_emeta")) %>% as.data.frame() # %>% knitr::kable()
 ```
 
 ## project ipmart
@@ -164,23 +164,134 @@ ipmart_example <- project_ipmart(projectname = "projects",
 class(ipmart_example) <- "list"
 ipmart_example$Project$DataType <- ipmart_example$Project$DataType %>% as.list()
 ipmart_example$Project$Name <- ipmart_example$Project$Name %>% as.list()
-ipmart_example %>% data.tree::as.Node(nodeName = "project_ipmart") %>% plot()
+ipmart_example %>% data.tree::as.Node(nodeName = "project ipmart") %>% plot()
 ```
+
+**Components:**
 
 Above is an example of a project ipmart constructed from project pmart objects.The 
 data type names are extracted from the object's project which still contains a 
-name and data type. 
+name and data type. There can be no more than 2 metabolomics (1 of: NMR or GC/LC-MS), 
+no more than 2 lipidomics datasets, and no more than 1 proteomics (peptide or protein) dataset. 
 
 **Tags:**
 
 ```{r}
 pull_tags_from_object(project_ipmart(projectname = "projects", 
    objects = list(metab_project, nmr_project, lipid_project, protein_project))) %>%
-  as.data.frame() %>% knitr::kable()
+  as.data.frame() # %>% knitr::kable()
 ```
 
 The DataType in this case is "project pmart" since the project ipmart is contained entirely
 of project pmart objects.
 
 #### Inputs: midpoint pmart
+
+```{r}
+# Load peptide data
+myPepObject <- pmartRdata::pep_object
+
+# Log transform data
+myPepObject <- edata_transform(myPepObject, "log2")
+
+# Set group designation
+myPepObject <- group_designation(myPepObject, main_effects = "Condition")
+
+# Apply filters
+myPepObject <- applyFilt(molecule_filter(myPepObject), myPepObject, min_num = 2)
+myPepObject <- applyFilt(rmd_filter(myPepObject), myPepObject, pvalue_threshold = 0.0001)
+
+# Run Normalization
+myPepObject <- normalize_global(myPepObject, "all", "mean", apply_norm = TRUE)
+
+## Now, let's simulate exporting a midpoint file at this step 
+
+pep_midpoint <- midpoint_pmart(omics_data = myPepObject,
+               tab = "normalization_tab", 
+               project = project_pmart(projectname = "My Peptide Data",
+                                       datatype = "Peptide-level Label Free",
+                                       edata = pmartRdata::pep_edata,
+                                       fdata = pmartRdata::pep_fdata,
+                                       emeta = pmartRdata::pep_emeta,
+                                       edata_filename = "pep_edata",
+                                       fdata_filename = "pep_fdata",
+                                       emeta_filename = "pep_emeta")
+               )
+               
+# Load lipidomics data 
+myLipidObject <- pmartRdata::lipid_object
+
+# Log transform data
+myLipidObject <- edata_transform(myLipidObject, "log2")
+
+# Set group designation
+myLipidObject <- group_designation(myLipidObject, main_effects = "Condition")
+
+# Apply filters
+myLipidObject <- applyFilt(rmd_filter(myLipidObject), myLipidObject, pvalue_threshold = 0.0001)
+
+# Run Normalization
+myLipidObject <- normalize_global(myLipidObject, "all", "mean", apply_norm = TRUE)
+
+lipid_midpoint <- midpoint_pmart(omics_data = myLipidObject,
+                  tab = "normalization_tab", 
+                  project = project_pmart(projectname = "My Lipid Data",
+                                          datatype = "Lipidomics-Positive",
+                                          edata = pmartRdata::lipid_edata,
+                                          fdata = pmartRdata::lipid_fdata,
+                                          emeta = NULL,
+                                          edata_filename = "lipid_edata",
+                                          fdata_filename = "lipid_fdata",
+                                          emeta_filename = NULL)
+)
+
+
+ipmart_example2 <- project_ipmart(projectname = "midpoints", objects = list(pep_midpoint, lipid_midpoint))
+class(ipmart_example2) <- "list"
+ipmart_example2$Project$DataType <- ipmart_example2$Project$DataType %>% as.list()
+ipmart_example2$Project$Name <- ipmart_example2$Project$Name %>% as.list()
+ipmart_example2$Objects$`Peptide-level Label Free`$Tracking$Timestamp <- 
+  ipmart_example2$Objects$`Peptide-level Label Free`$Tracking$Timestamp %>% as.list()
+ipmart_example2$Objects$`Peptide-level Label Free`$Tracking$Tab <- 
+  ipmart_example2$Objects$`Peptide-level Label Free`$Tracking$Tab %>% as.list()
+ipmart_example2$Objects$`Lipidomics-Positive`$Tracking$Timestamp <- 
+  ipmart_example2$Objects$`Lipidomics-Positive`$Tracking$Timestamp %>% as.list()
+ipmart_example2$Objects$`Lipidomics-Positive`$Tracking$Tab <- 
+  ipmart_example2$Objects$`Lipidomics-Positive`$Tracking$Tab %>% as.list()
+ipmart_example2 %>% data.tree::as.Node(nodeName = "project ipmart") %>% plot()
+```
+
+**Components:**
+
+The most complicated of our project objects is the ipmart project built from 
+pmart inputs. In the construction of this object, the "Tab" under "Tracking" must
+match other pmart midpoint objects. The included 2-5 datasets must follow the same
+rules as above. As a reminder, all e_data, f_data, etc. also has a e_data_filename, etc.
+which tracks the original name of the inputted file. These are not pictured for
+a cleaner plot. Data Objects in a pmart midpoint must contain an "OmicsData" object
+which contains the normalized data (in this case). If statistics or peptide 
+statistics were completed in this step, they would be included underneath "Data Objects."
+
+**Tags:**
+
+```{r}
+pull_tags_from_object(project_ipmart(projectname = "midpoints", objects = list(pep_midpoint, lipid_midpoint))) %>%
+  as.data.frame() # %>% knitr::kable()
+```
+
+The DataType in this case is "midpoint pmart" since the project ipmart is contained entirely
+of midpoint pmart objects.
+
+## midpoint pmart
+
+```{r}
+# Run Normalization
+myPepObject <- normalize_global(myPepObject, "all", "mean", apply_norm = TRUE)
+myPepStats <- imd_anova(myPepObject, test_method = "combined")
+myProObject <- pmartR::protein_quant()
+
+
+class(pep_midpoint) <- "list"
+pep_midpoint %>% data.tree::as.Node(nodeName = "midpoint pmart") %>% plot()
+```
 
