@@ -8,6 +8,7 @@ midpoint_pmart(
   omics_data,
   tab,
   project,
+  name = "exportedFromPMART",
   omics_stats = NULL,
   omics_stats_pep = NULL
 )
@@ -20,6 +21,8 @@ midpoint_pmart(
 and "statistics_tab". Required.}
 
 \item{project}{A project pmart object. Required.}
+
+\item{name}{A string to indicate the name of the midpoint file. Optional.}
 
 \item{omics_stats}{An omicsStats object as defined in pmartR. Optional.}
 
@@ -92,8 +95,8 @@ lipid_midpoint <- midpoint_pmart(omics_data = myLipidObject,
                                           edata = pmartRdata::lipid_edata,
                                           fdata = pmartRdata::lipid_fdata,
                                           emeta = NULL,
-                                          edata_filename = "pep_edata",
-                                          fdata_filename = "pep_fdata",
+                                          edata_filename = "lipid_edata",
+                                          fdata_filename = "lipid_fdata",
                                           emeta_filename = NULL)
                )
 

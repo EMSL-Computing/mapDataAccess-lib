@@ -30,7 +30,7 @@ one unique universal identifier (UUID) would need to be passed to open an app wi
 
 **Midpoints:** These are pmartR partially or completely processed data objects. 
 
-* **midpoint_pmart:** An object exported by pmart. Contains both the original project objects and the processed data. Data exported from an application can be opened in the subsequent tab. The order of possible tabs to export a midpoint from are Normalization, Peptide Statistics, Protein Rollup, and Statistics. A midpoint_pmart can be opened again in pmart or incorporated with other pmart_midpoints from the same tab into a project_ipmart object. Can be opened by pmart or MODE. 
+* **midpoint_pmart:** An object exported by pmart. Contains both the original project objects and the processed data. Data exported from an application can be opened in the subsequent tab. The order of possible tabs to export a midpoint from are Normalization, Peptide Statistics, Protein Rollup, and Statistics. A midpoint pmart can be opened again in pmart or incorporated with other midpoint pmart objects from the same tab into a ipmart project object. Can be opened by pmart or MODE. 
 
 * **midpoint_ipmart:** An object exported by ipmart. Contains 2-5 datasets processed through the Normalization, Statistics, and Integration tabs. Can be opened by ipmart or MODE.
 
@@ -71,7 +71,7 @@ quickly extract data about what has been uploaded.
 pull_tags_from_object(project_edata(projectname = "LipidToMode",
              datatype = "Lipidomics-Positive",
              edata = pmartRdata::lipid_edata,
-             edata_filename = "lip_edata")) %>% as.data.frame() # %>% knitr::kable()
+             edata_filename = "lip_edata")) %>% as.data.frame() %>% knitr::kable()
 ```
 
 ## project pmart
@@ -115,12 +115,12 @@ pull_tags_from_object(project_pmart(projectname = "My Peptide Data",
              emeta = pmartRdata::pep_emeta,
              edata_filename = "pep_edata",
              fdata_filename = "pep_fdata",
-             emeta_filename = "pep_emeta")) %>% as.data.frame() # %>% knitr::kable()
+             emeta_filename = "pep_emeta")) %>% as.data.frame() %>% knitr::kable()
 ```
 
 ## project ipmart
 
-#### Inputs: project pmart
+#### Inputs: project pmart objects
 
 ```{r}
 # Make a metabolomics GC/LC MS project
@@ -179,13 +179,13 @@ no more than 2 lipidomics datasets, and no more than 1 proteomics (peptide or pr
 ```{r}
 pull_tags_from_object(project_ipmart(projectname = "projects", 
    objects = list(metab_project, nmr_project, lipid_project, protein_project))) %>%
-  as.data.frame() # %>% knitr::kable()
+  as.data.frame() %>% knitr::kable()
 ```
 
 The DataType in this case is "project pmart" since the project ipmart is contained entirely
 of project pmart objects.
 
-#### Inputs: midpoint pmart
+#### Inputs: midpoint pmart objects
 
 ```{r}
 # Load peptide data
@@ -215,7 +215,8 @@ pep_project <- project_pmart(projectname = "My Peptide Data",
                                        emeta_filename = "pep_emeta")
 pep_midpoint <- midpoint_pmart(omics_data = myPepObject,
                tab = "normalization_tab", 
-               project = pep_project
+               project = pep_project,
+               name = "peptide midpoint example"
                )
                
 # Load lipidomics data 
@@ -264,7 +265,7 @@ ipmart_example2 %>% data.tree::as.Node(nodeName = "project ipmart") %>% plot()
 **Components:**
 
 The most complicated of our project objects is the ipmart project built from 
-pmart inputs. In the construction of this object, the "Tab" under "Tracking" must
+midpoint pmart objects. In the construction of this object, the "Tab" under "Tracking" must
 match other pmart midpoint objects. The included 2-5 datasets must follow the same
 rules as above. As a reminder, all e_data, f_data, etc. also has a e_data_filename, etc.
 which tracks the original name of the inputted file. These are not pictured for
@@ -276,7 +277,7 @@ statistics were completed in this step, they would be included underneath "Data 
 
 ```{r}
 pull_tags_from_object(project_ipmart(projectname = "midpoints", objects = list(pep_midpoint, lipid_midpoint))) %>%
-  as.data.frame() # %>% knitr::kable()
+  as.data.frame() %>% knitr::kable()
 ```
 
 The DataType in this case is "midpoint pmart" since the project ipmart is contained entirely
@@ -291,9 +292,13 @@ myPepStats <- imd_anova(myPepObject, test_method = "combined")
 myProObject <- pmartR::protein_quant(myPepObject, "rrollup")
 myProStats <- imd_anova(myProObject, test_method = "combined")
 
-pmart_midpoint_ex <- midpoint_pmart(myProObject, "statistics_tab", pep_project, 
+pmart_midpoint_ex <- midpoint_pmart(myProObject, "statistics_tab", pep_project, "Full peptide example", 
                                   myProStats, myPepStats)
 class(pmart_midpoint_ex) <- "list"
+pmart_midpoint_ex$Tracking$Name <- as.list(pmart_midpoint_ex$Tracking$Name)
+pmart_midpoint_ex$Tracking$Timestamp <- as.list(pmart_midpoint_ex$Tracking$Timestamp)
+pmart_midpoint_ex$Tracking$Tab <- as.list(pmart_midpoint_ex$Tracking$Tab)
+pmart_midpoint_ex$Tracking$fmeta <- as.list(pmart_midpoint_ex$Tracking$fmeta)
 pmart_midpoint_ex %>% data.tree::as.Node(nodeName = "midpoint pmart") %>% plot()
 ```
 
@@ -308,8 +313,9 @@ and OmicsStats is the protein statistics.
 
 ```{r}
 pull_tags_from_object(midpoint_pmart(myProObject, "statistics_tab", pep_project, 
+                                     "exportedFromPMART",
                                   myProStats, myPepStats)) %>%
-  as.data.frame() # %>% knitr::kable()
+  as.data.frame() %>% knitr::kable()
 ```
 
 Important information regarding the file to route back to users is the type 
@@ -319,9 +325,38 @@ data was exported from (statistics_tab) and the time the data was exported.
 
 ## midpoint ipmart 
 
+```{r}
+pmart_midpoint_ex <- midpoint_pmart(myProObject, "statistics_tab", pep_project, 
+                                  myProStats, myPepStats)
+ipmart_midpoint_ex <- midpoint_ipmart(
+  midpoints = list(pmart_midpoint_ex, lipid_midpoint),
+  tab = "normalization_tab"
+)
+class(ipmart_midpoint_ex) <- "list"
+ipmart_midpoint_ex$Tracking$Name <- as.list(ipmart_midpoint_ex$Tracking$Name)
+ipmart_midpoint_ex$Tracking$Timestamp <- as.list(ipmart_midpoint_ex$Tracking$Timestamp)
+ipmart_midpoint_ex$Tracking$Tab <- as.list(ipmart_midpoint_ex$Tracking$Tab)
+ipmart_midpoint_ex$Tracking$fmeta <- as.list(ipmart_midpoint_ex$Tracking$fmeta)
+ipmart_midpoint_ex$`Data Objects`$`Peptide-level Label Free` <- list("none")
+ipmart_midpoint_ex$`Data Objects`$`Lipidomics-Positive` <- list("none")
+ipmart_midpoint_ex %>% data.tree::as.Node(nodeName = "midpoint ipmart") %>% plot()
+```
 
+**Components:** midpoint ipmart objects are similar to project ipmart objects,
+with the exception that midpoint ipmart objects cannot contain any pmart project
+objects. ipmart midpoints contain nested pmart midpoint objects. In this case, 
+one peptide-rollup-to-protein example and one lipidomics peptide example. The details
+of the midpoint pmart object have been removed for clarity.
 
+**Tags:**
 
+```{r}
+pull_tags_from_object(midpoint_ipmart(
+  midpoints = list(pmart_midpoint_ex, lipid_midpoint),
+  tab = "normalization_tab"
+)) %>%
+  as.data.frame() %>% knitr::kable()
+```
 
-
-
+This is a prototype for the ipmart app. I'm not sure if I'll need an integration object,
+or something else. But I will proceed forward with this and edit this object as needed. 

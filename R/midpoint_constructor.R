@@ -8,6 +8,7 @@
 #'    "normalization_tab", "peptide_statistics_tab", "protein_rollup_tab",
 #'    and "statistics_tab". Required. 
 #' @param project A project pmart object. Required. 
+#' @param name A string to indicate the name of the midpoint file. Optional. 
 #' @param omics_stats An omicsStats object as defined in pmartR. Optional. 
 #' @param omics_stats_pep A peptide omicsStats object as defined in pmartR. Optional. 
 #' 
@@ -80,7 +81,7 @@
 #' 
 #' }
 #' @export
-midpoint_pmart <- function(omics_data, tab, project, omics_stats = NULL, omics_stats_pep = NULL) {
+midpoint_pmart <- function(omics_data, tab, project, name = "exportedFromPMART", omics_stats = NULL, omics_stats_pep = NULL) {
   
   # Check omics_data is an omics data object
   if (any(class(omics_data) %in% c("pepData", "proData", "metabData", "lipidData")) == FALSE) {
@@ -130,6 +131,7 @@ midpoint_pmart <- function(omics_data, tab, project, omics_stats = NULL, omics_s
       ),
     "Tracking" = 
       list(
+        "Name" = .scrub_clean(name), 
         "Timestamp" = Sys.time(),
         "Tab" = tab,
         "Original Files" = project
@@ -169,13 +171,20 @@ midpoint_pmart <- function(omics_data, tab, project, omics_stats = NULL, omics_s
 #' 
 #' }
 #' @export
-midpoint_ipmart <- function(midpoints, tab, fmeta) {
+midpoint_ipmart <- function(midpoints, tab, name = "exportedFromIPMART", fmeta = NULL) {
   
   # All midpoints must be midpoint pmart objects 
   getClasses <- lapply(midpoints, class) %>% unlist() %>% unique()
   if (((getClasses != "midpoint pmart") %>% any())) {
     stop("midpoints must all be midpoint pmart objects.")
   }
+  
+  # Tab must be "normalization_tab", "statistics_tab", or "integration_tab". 
+  if (as.character(tab) %in% c("normalization_tab", "statistics_tab", "integration_tab") == FALSE) {
+    stop("tab must be normalization_tab, statistics_tab, or integration_tab.")
+  }
+  
+  ## TODO: Add fmeta check 
   
   # Get project types 
   ProjectTypes <- lapply(midpoints, function(midpoint) {
@@ -189,6 +198,38 @@ midpoint_ipmart <- function(midpoints, tab, fmeta) {
     
   }) %>% unlist() %>% table() %>% c()
   
+  # Ensure there is at most 1 peptide/proteomics, 2 lipidomics, 1 metabolomics GC/LC-MS, 1 metabolomics NMR
+  if ("Proteomics" %in% names(ProjectTypes) && ProjectTypes[["Proteomics"]] > 1) {
+    stop("ipmart cannot accept more than 1 proteomics (peptide or protein) dataset.")
+  }
+  if ("Lipidomics" %in% names(ProjectTypes) && ProjectTypes[["Lipidomics"]] > 2) {
+    stop("ipmart cannot accept more than 2 lipidomics datasets.")
+  }
+  if ("Metabolomics-GC/LC-MS" %in% names(ProjectTypes) && ProjectTypes[["Metabolomics-GC/LC-MS"]] > 1) {
+    stop("ipmart cannot accept more than 1 metabolomics GC/LC-MS dataset.")
+  }
+  if ("Metabolomics-NMR" %in% names(ProjectTypes) && ProjectTypes[["Metabolomics-NMR"]] > 1) {
+    stop("ipmart cannot accept more than 1 metabolomics NMR dataset.")
+  }
   
+  # Name the objects by their data types
+  names(midpoints) <- lapply(midpoints, function(x) {x$Tracking$`Original Files`$Project$DataType}) %>% unlist()
+  
+  # Create Object
+  MidPoint <- list(
+    "Data Objects" = midpoints,
+    "Tracking" = 
+      list(
+        "Name" = .scrub_clean(name),
+        "Timestamp" = Sys.time(),
+        "Tab" = tab,
+        "fmeta" = fmeta
+      )
+  )
+  
+  # Add class
+  class(MidPoint) <- "midpoint ipmart"
+  
+  return(MidPoint)
   
 }

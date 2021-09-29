@@ -49,7 +49,7 @@
 pull_tags_from_object <- function(object) {
   
   # Check object class
-  if (class(object) %in% c("project edata", "project pmart", "project ipmart", "midpoint pmart") == FALSE) {
+  if (class(object) %in% c("project edata", "project pmart", "project ipmart", "midpoint pmart", "midpoint ipmart") == FALSE) {
     stop("object class not known. Must be a project or midpoint.")
   } 
   
@@ -85,13 +85,24 @@ pull_tags_from_object <- function(object) {
       list(
         "ObjectType" = class(object),
         "DataType" = object$Tracking$`Original Files`$Project$DataType,
-        "ProjectName" = object$Tracking$`Original Files`$Project$Name,
+        "ProjectName" = object$Tracking$Name,
         "Tab" = object$Tracking$Tab,
         "SaveTime" = object$Tracking$Timestamp
       )
     )
   }
   
-  # TODO: Return the tags for midpoint ipmart object
+  # Return the tags for a midpoint ipmart object
+  if (class(object) == "midpoint ipmart") {
+    return(
+      list(
+        "ObjectType" = class(object),
+        "DataType" = "multi-omics",
+        "ProjectName" = object$Tracking$Name,
+        "Tab" = object$Tracking$Tab,
+        "SaveTime" = object$Tracking$Timestamp
+      )
+    )
+  }
   
 }
