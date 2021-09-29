@@ -143,4 +143,52 @@ midpoint_pmart <- function(omics_data, tab, project, omics_stats = NULL, omics_s
   
 }
 
-## TODO: ipmart midpoint file
+#' Generate a midpoint analysis file for ipmart
+#' 
+#' @description Possible "exit" points to generate an midpoint file in ipmart are
+#'     normalization, peptide statistics, peptide rollup, and statistics. 
+#'
+#' @param midpoints List of midpoint pmart objects from the same tab. Must contain 2-5 objects. There can be
+#'    no more than 2 metabolomics (1 of: NMR or GC/LC-MS), no more than 2 lipidomics datasets, 
+#'    and no more than 1 proteomics (peptide or protein) dataset. Required. 
+#' @param tab The ipmart tab the data was exported from. Acceptable entries are 
+#'    "normalization_tab", "statistics_tab", or "integration_tab". Required.
+#' @param fmeta Must be a dataframe or data table. If not provided, users can built it in 
+#'    ipmart. Default is NULL. 
+#'
+#' @return A midpoint ipmart object
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' # Generate the two midpoint pmart objects from in the "midpoint_pmart" example
+#' 
+#' midpoint_ipmart(midpoints = list(pep_midpoint, lipid_midpoint),
+#'                 tab = "normalization_tab", 
+#'                 fmeta = NULL)
+#' 
+#' }
+#' @export
+midpoint_ipmart <- function(midpoints, tab, fmeta) {
+  
+  # All midpoints must be midpoint pmart objects 
+  getClasses <- lapply(midpoints, class) %>% unlist() %>% unique()
+  if (((getClasses != "midpoint pmart") %>% any())) {
+    stop("midpoints must all be midpoint pmart objects.")
+  }
+  
+  # Get project types 
+  ProjectTypes <- lapply(midpoints, function(midpoint) {
+    
+    # Get data type
+    DataType <- midpoint$Tracking$`Original Files`$Project$DataType
+    
+    # Simplify data type to metabolomics/lipidomics/proteomics
+    if (grepl("Peptide|Protein", DataType)) {return("Proteomics")} else
+      if (grepl("Lipidomics", DataType)) {return("Lipidomics")} else {return(DataType)}
+    
+  }) %>% unlist() %>% table() %>% c()
+  
+  
+  
+}

@@ -205,10 +205,7 @@ myPepObject <- applyFilt(rmd_filter(myPepObject), myPepObject, pvalue_threshold 
 myPepObject <- normalize_global(myPepObject, "all", "mean", apply_norm = TRUE)
 
 ## Now, let's simulate exporting a midpoint file at this step 
-
-pep_midpoint <- midpoint_pmart(omics_data = myPepObject,
-               tab = "normalization_tab", 
-               project = project_pmart(projectname = "My Peptide Data",
+pep_project <- project_pmart(projectname = "My Peptide Data",
                                        datatype = "Peptide-level Label Free",
                                        edata = pmartRdata::pep_edata,
                                        fdata = pmartRdata::pep_fdata,
@@ -216,6 +213,9 @@ pep_midpoint <- midpoint_pmart(omics_data = myPepObject,
                                        edata_filename = "pep_edata",
                                        fdata_filename = "pep_fdata",
                                        emeta_filename = "pep_emeta")
+pep_midpoint <- midpoint_pmart(omics_data = myPepObject,
+               tab = "normalization_tab", 
+               project = pep_project
                )
                
 # Load lipidomics data 
@@ -288,10 +288,40 @@ of midpoint pmart objects.
 # Run Normalization
 myPepObject <- normalize_global(myPepObject, "all", "mean", apply_norm = TRUE)
 myPepStats <- imd_anova(myPepObject, test_method = "combined")
-myProObject <- pmartR::protein_quant()
+myProObject <- pmartR::protein_quant(myPepObject, "rrollup")
+myProStats <- imd_anova(myProObject, test_method = "combined")
 
-
-class(pep_midpoint) <- "list"
-pep_midpoint %>% data.tree::as.Node(nodeName = "midpoint pmart") %>% plot()
+pmart_midpoint_ex <- midpoint_pmart(myProObject, "statistics_tab", pep_project, 
+                                  myProStats, myPepStats)
+class(pmart_midpoint_ex) <- "list"
+pmart_midpoint_ex %>% data.tree::as.Node(nodeName = "midpoint pmart") %>% plot()
 ```
+
+**Components:**
+
+Here is a full pmart midpoint file with OmicsData, OmicsStats, and OmicsStatsPep.
+The original files are also stored in the object. The OmicsData in this case 
+is protein data (rolled up from peptide). OmicsStatsPep is the peptide statistics, 
+and OmicsStats is the protein statistics. 
+
+**Tags:**
+
+```{r}
+pull_tags_from_object(midpoint_pmart(myProObject, "statistics_tab", pep_project, 
+                                  myProStats, myPepStats)) %>%
+  as.data.frame() # %>% knitr::kable()
+```
+
+Important information regarding the file to route back to users is the type 
+("midpoint pmart" means the file was exported from pmart), its Data Type, the
+name of the file (users will be able to change this), the tab in pmart that the 
+data was exported from (statistics_tab) and the time the data was exported. 
+
+## midpoint ipmart 
+
+
+
+
+
+
 
