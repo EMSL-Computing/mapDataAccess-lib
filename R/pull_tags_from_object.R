@@ -87,7 +87,7 @@ pull_tags_from_object <- function(object) {
         "DataType" = object$Tracking$`Original Files`$Project$DataType,
         "ProjectName" = object$Tracking$Name,
         "Tab" = object$Tracking$Tab,
-        "SaveTime" = object$Tracking$Timestamp
+        "SaveTime" = object$Tracking$Timestamp %>% as.character()
       )
     )
   }
@@ -100,7 +100,7 @@ pull_tags_from_object <- function(object) {
         "DataType" = "multi-omics",
         "ProjectName" = object$Tracking$Name,
         "Tab" = object$Tracking$Tab,
-        "SaveTime" = object$Tracking$Timestamp
+        "SaveTime" = object$Tracking$Timestamp %>% as.character()
       )
     )
   }
