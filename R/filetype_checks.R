@@ -14,21 +14,27 @@
 is_edata <- function(edata) {
   
   # If edata is NULL, return FALSE
-  if (is.null(edata)) {
-    message("No Expression Data provided.")
+  if (is.null(edata) || is.data.frame(edata) == FALSE) {
+    message("Expression Data must be a data.frame or data.table")
     return(FALSE)
   }
   
   # edata must have at least 2 samples 
   if (ncol(edata) < 3) {
-    message("Expression Data must have at least 3 columns, a 'desciptor' column and at least 2 samples.")
+    message("Expression Data must have at least 3 columns, a 'descriptor' column and at least 2 samples.")
     return(FALSE)
   }
   
-  # All columns with the exception of the first column MUST be numeric
-  CheckClassCol <- lapply(2:ncol(edata), function(col) {edata[,col] %>% class()}) %>% unlist()
-  if (all(CheckClassCol == "numeric") == FALSE) {
-    message("All columns in Expression Data must be numeric, with exception of the first 'descriptor' column.")
+  ## All columns with the exception of one column MUST be numeric
+  
+  # Get counts of the number of numeric columns
+  LogicCounts <- lapply(1:ncol(edata), function(col) {is.numeric(edata[,col])}) %>% 
+    unlist() %>%
+    table() 
+  
+  # If more than one column is not numeric, return error 
+  if ("FALSE" %in% names(LogicCounts) && LogicCounts[["FALSE"]] > 1) {
+    message("All columns in Expression Data must be numeric, with exception of a 'descriptor' column.")
     return(FALSE)  
   }
   
@@ -54,12 +60,12 @@ is_edata <- function(edata) {
 is_fdata <- function(edata, fdata) {
   
   # Make sure neither file is NULL 
-  if (is.null(edata)) {
-    message("No Expression Data provided.")
+  if (is.null(edata) || is.data.frame(edata) == FALSE) {
+    message("Expression Data must be a data.frame or data.table.")
     return(FALSE)
   }
-  if (is.null(fdata)) {
-    message("No Sample Information provided.")
+  if (is.null(fdata) || is.data.frame(fdata) == FALSE) {
+    message("Sample Information must be a data.frame or data.table.")
     return(FALSE)
   }
   
@@ -101,12 +107,12 @@ is_fdata <- function(edata, fdata) {
 is_emeta <- function(edata, emeta) {
   
   # Make sure neither file is NULL 
-  if (is.null(edata)) {
-    message("No Expression Data provided.")
+  if (is.null(edata) || is.data.frame(edata) == FALSE) {
+    message("Expression data must be a data.frame or data.table.")
     return(FALSE)
   }
-  if (is.null(emeta)) {
-    message("No Biomolecule Information provided.")
+  if (is.null(emeta) || is.data.frame(emeta) == FALSE) {
+    message("Biomolecule Information must be a data.frame or data.table.")
     return(FALSE)
   }
   
@@ -126,6 +132,71 @@ is_emeta <- function(edata, emeta) {
   }
   
   # Otherwise, return True
+  return(TRUE)
+  
+}
+
+#' Test if a file is an f_meta file
+#' 
+#' @param edata_files A list of edata files. Required. 
+#' @param fmeta Must be a data.frame or data.table. Required.
+#' 
+#' @return A boolean where TRUE means the file is an acceptable f_meta file.
+#' @examples \dontrun{
+#' 
+#' library(pmartRdata)
+#' edata_files <- list(pmartRdata::lipid_edata, pmartRdata::pep_edata)
+#' fmeta <- data.frame(
+#'     PepSampleID = colnames(pmartRdata::pep_edata)[-1],
+#'     LipidSampleID = c(paste0("Infection", 1:4), "", 
+#'                       paste0("Infection", 6:9), paste0("Mock", 1:3))
+#' )
+#' is_fmeta(edata_files = edata_files, fmeta = fmeta)
+#' 
+#' }
+#' @export
+is_fmeta <- function(edata_files, fmeta) {
+  
+  # Check that edata_files list is a list of at least length 2
+  if (is.list(edata_files) == FALSE || length(edata_files) < 2) {
+    message("There must be at least two Expression Data (edata_files).")
+    return(FALSE)
+  }
+  
+  # Iterate through each edata and confirm they are all edata
+  if (lapply(edata_files, is_edata) %>% unlist() %>% all() == FALSE) {
+    message("At least one file in the Expression Data files (edata_files) is not an Expression Data file. See ?is_edata for more details.")
+    return(FALSE)
+  }
+  
+  # Assert fmeta is not null
+  if (is.null(fmeta) || is.data.frame(fmeta) == FALSE) {
+    message("Multi-omic Sample Information must be a data.frame or data.table.")
+    return(FALSE)
+  }
+  
+  # 1. The number of rows in f_meta must be as long as the longest number of columns in e_data minus 1.
+  allLengths <- lapply(edata_files, ncol) %>% unlist()
+  if (nrow(fmeta) != (max(allLengths) - 1)) {
+    message("The number of rows in the Multi-Omic Sample Information file must be equal to the number of columns in the Expression Data files minus 1.")
+    return(FALSE)
+  }
+  
+  # 2. All but one of the edata colnames must be in the fmeta file
+  EDataColsInFmetaRows <- lapply(edata_files, function(edata) {
+    LogicCounts <- (colnames(edata) %in% (fmeta %>% unlist())) %>% table()
+    if ("FALSE" %in% names(LogicCounts) && LogicCounts[["FALSE"]] > 1) {
+      return(FALSE)
+    } else {return(TRUE)}
+  }) %>% unlist()
+  
+  # Check that each edata colnames passed
+  if (all(EDataColsInFmetaRows) == FALSE) {
+    message("All but the 'descriptor' column in Expression Data must be in the Multi-Omic Sample Information file.")
+    return(FALSE)
+  }
+  
+  # Otherwise, return true
   return(TRUE)
   
 }

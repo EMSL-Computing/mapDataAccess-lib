@@ -185,16 +185,6 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
 #'                                fdata = pmartRdata::metab_fdata,
 #'                                edata_filename = "metab_edata",
 #'                                fdata_filename = "metab_fdata")
-#'                                
-#' # Make a metabolomics NMR project
-#' nmr_project <- project_pmart(projectname = "My NMR Data",
-#'                                datatype = "Metabolomics-NMR",
-#'                                edata = pmartRdata::nmr_edata_identified,
-#'                                fdata = pmartRdata::nmr_fdata_identified,
-#'                                emeta = pmartRdata::nmr_emeta_identified,
-#'                                edata_filename = "nmr_edata",
-#'                                fdata_filename = "nmr_fdata",
-#'                                emeta_filename = "nmr_emeta")
 #'                           
 #'                                                     
 #' # Make a lipidomics project
@@ -212,9 +202,16 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
 #'                                 fdata = pmartRdata::pro_fdata,
 #'                                 edata_filename = "pro_edata",
 #'                                 fdata_filename = "pro_fdata")
+#'                                 
+#' # Create an f_meta file
+#' fmeta <- data.frame(
+#'   "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", 1:7), "", "Infection9"),
+#'   "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", 1:4), "", paste0("Infection",6:9)),
+#'   "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", 1:7), "", "Infection9")
+#' )
 #'                           
 #' # Finally, make the ipmart midpoint object
-#' project_ipmart(projectname = "projects", objects = list(metab_project, nmr_project, lipid_project, protein_project))
+#' project_ipmart(projectname = "projects", objects = list(metab_project, lipid_project, protein_project))
 #' 
 #' # Or use the pmart_midpoint examples 
 #' project_ipmart(projectname = "midpoints", objects = list(pep_midpoint, lipid_midpoint))                          
@@ -228,8 +225,6 @@ project_ipmart <- function(projectname, objects, fmeta = NULL) {
     stop("objects must be at least length 2, and no more than 5.")
   }
   
-  ## TODO: Add fmeta check
-  
   # Iterate through class information
   get_classes <- lapply(objects, class) %>% unlist()
   
@@ -240,6 +235,22 @@ project_ipmart <- function(projectname, objects, fmeta = NULL) {
   # If both are FALSE, trigger a warning
   if (ProjectData == FALSE & MidpointData == FALSE) {
     stop("objects must be either all project_pmart objects or midpoint_pmart objects.")
+  }
+  
+  # Check the f_meta object
+  if (is.null(fmeta) == FALSE) {
+    
+    # Pull edata objects
+    edata_list <- lapply(objects, function(object) {
+      if (class(object) == "project pmart") {object$Data$e_data} else
+      if (class(object) == "midpoint pmart") {object$`Data Objects`$OmicsData$e_data}
+    })
+    
+    # Run f_meta check
+    if (is_fmeta(edata_list, fmeta) == FALSE) {
+      stop("Multi-omics Sample Information (f_meta) file is not valid. No worries, you can create one in iPMART.")
+    }
+    
   }
   
   # Get project types 
