@@ -7,7 +7,7 @@
 midpoint_pmart(
   omics_data,
   tab,
-  project,
+  project = NULL,
   name = "exportedFromPMART",
   omics_stats = NULL,
   omics_stats_pep = NULL

@@ -81,7 +81,7 @@
 #' 
 #' }
 #' @export
-midpoint_pmart <- function(omics_data, tab, project, name = "exportedFromPMART", omics_stats = NULL, omics_stats_pep = NULL) {
+midpoint_pmart <- function(omics_data, tab, project = NULL, name = "exportedFromPMART", omics_stats = NULL, omics_stats_pep = NULL) {
   
   # Check omics_data is an omics data object
   if (any(class(omics_data) %in% c("pepData", "proData", "metabData", "lipidData")) == FALSE) {
@@ -98,7 +98,7 @@ midpoint_pmart <- function(omics_data, tab, project, name = "exportedFromPMART",
   if (class(project) != "project pmart") {
     stop("project must be a project pmart object.")
   }
-  
+
   # Check that omics_stats and omics_stats_pep are statRes objects
   if (is.null(omics_stats_pep) == FALSE) {
     if (class(omics_stats_pep) != "statRes") {
