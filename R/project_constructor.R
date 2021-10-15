@@ -205,9 +205,9 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
 #'                                 
 #' # Create an f_meta file
 #' fmeta <- data.frame(
-#'   "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", 1:7), "", "Infection9"),
-#'   "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", 1:4), "", paste0("Infection",6:9)),
-#'   "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", 1:7), "", "Infection9")
+#'   "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4,6,7,9))),
+#'   "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4,6,7,9))),
+#'   "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4,6,7,9)))
 #' )
 #'                           
 #' # Finally, make the ipmart midpoint object
@@ -237,20 +237,20 @@ project_ipmart <- function(projectname, objects, fmeta = NULL) {
     stop("objects must be either all project_pmart objects or midpoint_pmart objects.")
   }
   
-  # Check the f_meta object
+  # Check the f_meta object - will be added later 
   if (is.null(fmeta) == FALSE) {
-    
-    # Pull edata objects
+   
+   # Pull edata objects
     edata_list <- lapply(objects, function(object) {
       if (class(object) == "project pmart") {object$Data$e_data} else
       if (class(object) == "midpoint pmart") {object$`Data Objects`$OmicsData$e_data}
     })
-    
-    # Run f_meta check
+   
+   # Run f_meta check
     if (is_fmeta(edata_list, fmeta) == FALSE) {
       stop("Multi-omics Sample Information (f_meta) file is not valid. No worries, you can create one in iPMART.")
     }
-    
+   
   }
   
   # Get project types 

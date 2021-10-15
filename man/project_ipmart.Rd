@@ -58,9 +58,9 @@ protein_project <- project_pmart(projectname = "My Protein Data",
                                 
 # Create an f_meta file
 fmeta <- data.frame(
-  "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", 1:7), "", "Infection9"),
-  "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", 1:4), "", paste0("Infection",6:9)),
-  "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", 1:7), "", "Infection9")
+  "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4,6,7,9))),
+  "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4,6,7,9))),
+  "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4,6,7,9)))
 )
                           
 # Finally, make the ipmart midpoint object

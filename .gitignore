@@ -1,3 +1,16 @@
 venv
 doc
 Meta
+
+#####################
+## MAC OS SPECIFIC ##
+#####################
+
+.DS_Store
+
+################
+## R SPECIFIC ##
+################
+
+.RData
+.Rhistory

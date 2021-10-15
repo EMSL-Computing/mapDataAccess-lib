@@ -186,17 +186,17 @@ midpoint_ipmart <- function(midpoints, tab, name = "exportedFromIPMART", fmeta =
   
   # Check the f_meta object
   if (is.null(fmeta) == FALSE) {
-    
-    # Pull edata objects
+   
+   # Pull edata objects
     edata_list <- lapply(objects, function(object) {
       if (class(object) == "midpoint pmart") {object$`Data Objects`$OmicsData$e_data}
     })
-    
-    # Run f_meta check
+   
+   # Run f_meta check
     if (is_fmeta(edata_list, fmeta) == FALSE) {
       stop("Multi-omics Sample Information (f_meta) file is not valid.")
     }
-    
+   
   }
   
   # Get project types 

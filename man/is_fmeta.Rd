@@ -21,12 +21,14 @@ Test if a file is an f_meta file
 \dontrun{
 
 library(pmartRdata)
-edata_files <- list(pmartRdata::lipid_edata, pmartRdata::pep_edata)
+edata_files <- list(pmartRdata::pro_edata, pmartRdata::lipid_edata, pmartRdata::metab_edata)
 fmeta <- data.frame(
-    PepSampleID = colnames(pmartRdata::pep_edata)[-1],
-    LipidSampleID = c(paste0("Infection", 1:4), "", 
-                      paste0("Infection", 6:9), paste0("Mock", 1:3))
+   "Proteins" = c(paste0("Mock", 1:3), paste0("Infection", c(1:7)), NA,  "Infection9"),
+   "Lipids" = c(paste0("Mock", 1:3), paste0("Infection", c(1:4)), NA, paste0("Infection", c(6:9))),
+   "Metabolites" = c(paste0("Mock", 1:3), paste0("Infection", c(1:9))),
+   "Condition" = c(rep("A", 3), rep("B", 9))
 )
+
 is_fmeta(edata_files = edata_files, fmeta = fmeta)
 
 }
