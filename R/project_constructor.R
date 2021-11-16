@@ -238,20 +238,20 @@ project_ipmart <- function(projectname, objects, fmeta = NULL) {
   }
   
   # Check the f_meta object - will be added later 
-  if (is.null(fmeta) == FALSE) {
+  #if (is.null(fmeta) == FALSE) {
    
    # Pull edata objects
-    edata_list <- lapply(objects, function(object) {
-      if (class(object) == "project pmart") {object$Data$e_data} else
-      if (class(object) == "midpoint pmart") {object$`Data Objects`$OmicsData$e_data}
-    })
+  #  edata_list <- lapply(objects, function(object) {
+  #    if (class(object) == "project pmart") {object$Data$e_data} else
+  #    if (class(object) == "midpoint pmart") {object$`Data Objects`$OmicsData$e_data}
+  #  })
    
    # Run f_meta check
-    if (is_fmeta(edata_list, fmeta) == FALSE) {
-      stop("Multi-omics Sample Information (f_meta) file is not valid. No worries, you can create one in iPMART.")
-    }
+  #  if (is_fmeta(edata_list, fmeta) == FALSE) {
+  #    stop("Multi-omics Sample Information (f_meta) file is not valid. No worries, you can create one in iPMART.")
+  #  }
    
-  }
+  #}
   
   # Get project types 
   ProjectTypes <- lapply(objects, function(object) {

@@ -179,7 +179,7 @@ is_fmeta <- function(edata_files, fmeta) {
   
   # 1. The number of rows in f_meta must be as long as the longest number of columns in e_data minus 1.
   allLengths <- lapply(edata_files, ncol) %>% unlist()
-  if (nrow(fmeta) != (max(allLengths) - 1)) {
+  if (nrow(fmeta) >= (max(allLengths) - 1)) {
     message("The number of rows in the Multi-Omic Sample Information file must be equal to the number of columns in the Expression Data files minus 1.")
     return(FALSE)
   }
