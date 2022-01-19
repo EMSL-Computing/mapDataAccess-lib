@@ -20,7 +20,7 @@ midpoint_pmart(
 "normalization_tab", "peptide_statistics_tab", "protein_rollup_tab",
 and "statistics_tab". Required.}
 
-\item{project}{A project pmart object. Required.}
+\item{project}{A project omic object. Required.}
 
 \item{name}{A string to indicate the name of the midpoint file. Optional.}
 
@@ -63,7 +63,7 @@ myPepObject <- normalize_global(myPepObject, "all", "mean", apply_norm = TRUE)
 
 pep_midpoint <- midpoint_pmart(omics_data = myPepObject,
                tab = "normalization_tab", 
-               project = project_pmart(projectname = "My Peptide Data",
+               project = project_omic(projectname = "My Peptide Data",
                                        datatype = "Peptide-level Label Free",
                                        edata = pmartRdata::pep_edata,
                                        fdata = pmartRdata::pep_fdata,
@@ -74,7 +74,7 @@ pep_midpoint <- midpoint_pmart(omics_data = myPepObject,
                )
                
 # Load lipidomics data 
-myLipidObject <- pmartRdata::lipid_object
+myLipidObject <- pmartRdata::lipid_object_pos
 
 # Log transform data
 myLipidObject <- edata_transform(myLipidObject, "log2")
@@ -90,13 +90,13 @@ myLipidObject <- normalize_global(myLipidObject, "all", "mean", apply_norm = TRU
 
 lipid_midpoint <- midpoint_pmart(omics_data = myLipidObject,
                   tab = "normalization_tab", 
-                  project = project_pmart(projectname = "My Lipid Data",
+                  project = project_omic(projectname = "My Lipid Data",
                                           datatype = "Lipidomics-Positive",
-                                          edata = pmartRdata::lipid_edata,
-                                          fdata = pmartRdata::lipid_fdata,
+                                          edata = pmartRdata::lipid_edata_pos,
+                                          fdata = pmartRdata::lipid_fdata_pos,
                                           emeta = NULL,
-                                          edata_filename = "lipid_edata",
-                                          fdata_filename = "lipid_fdata",
+                                          edata_filename = "lipid_edata_pos",
+                                          fdata_filename = "lipid_fdata_pos",
                                           emeta_filename = NULL)
                )
 
