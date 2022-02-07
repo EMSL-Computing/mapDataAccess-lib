@@ -54,7 +54,7 @@ pull_tags_from_object <- function(object) {
   } 
   
   # Return the tags for a project pmart object
-  if (class(object) %in% c("project edata", "project pmart")) {
+  if (class(object) %in% c("project edata", "project omic")) {
     return(
       list(
         "ObjectType" = class(object), 
@@ -68,7 +68,7 @@ pull_tags_from_object <- function(object) {
   }
   
   # Return the tags for a project ipmart object
-  if (class(object) == "project ipmart") {
+  if (class(object) == "project multiomics") {
     return(
       list(
         "ObjectType" = class(object),
