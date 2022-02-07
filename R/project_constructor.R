@@ -10,7 +10,7 @@
   # Data Type must be of the following classes
   return(datatype %in% c("Peptide-level Label Free","Peptide-level Isobaric",
     "Protein-level Label Free", "Protein-level Isobaric", "Lipidomics-Negative",
-    "Lipidomics-Positive", "Metabolomics-GC/LC-MS", "Metabolomics-NMR")
+    "Lipidomics-Positive", "Metabolomics-GC/LC-MS", "Metabolomics-NMR", "Transcriptomics")
   )
   
 }

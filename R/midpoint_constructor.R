@@ -84,8 +84,8 @@
 midpoint_pmart <- function(omics_data, tab, project = NULL, name = "exportedFromPMART", omics_stats = NULL, omics_stats_pep = NULL) {
   
   # Check omics_data is an omics data object
-  if (any(class(omics_data) %in% c("pepData", "proData", "metabData", "lipidData")) == FALSE) {
-    stop("omics_data must be of the pmartR class pepData, proData, metabData, or lipidData")
+  if (any(class(omics_data) %in% c("pepData", "proData", "metabData", "lipidData", "seqData")) == FALSE) {
+    stop("omics_data must be of the pmartR class pepData, proData, metabData, lipidData, or seqData.")
   }
   
   # Tab must be of the correct class
