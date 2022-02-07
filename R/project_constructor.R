@@ -78,13 +78,13 @@ project_edata <- function(projectname, datatype, edata, edata_filename = NULL) {
   
 }
 
-#' Generate a project object to pass data from MAP to pmart
+#' Generate a project object to pass data from MAP to PMART/MODE. 
 #' 
-#' @description Constructs a project pmart object where edata and fdata are required. 
+#' @description Constructs a omic project object where edata and fdata are required. 
 #'     
 #' @param projectname Any string to name the project. All spaces and non-alphanumeric
 #'    characters will be removed to prevent issues with the visualizations. Required.
-#' @param datatype Must be of the acceptable MAP omic class. See .is_datatype for list. Required. 
+#' @param datatype Must be of the acceptable MAP omic class. See ?.is_datatype for list. Required. 
 #' @param edata Must be a dataframe or datatable. Required. 
 #' @param fdata Must be a dataframe or datatable. Required.
 #' @param emeta Must be a dataframe or datatable. Optional. 
@@ -92,12 +92,12 @@ project_edata <- function(projectname, datatype, edata, edata_filename = NULL) {
 #' @param fdata_name The path or name for the fdata file. Optional. 
 #' @param emeta_name The path or name for the emeta file. Optional. 
 #' 
-#' @return A project pmart object
+#' @return An omics project object
 #' @examples 
 #' \dontrun{
 #' 
 #' library(pmartRdata)
-#' project_pmart(projectname = "My Peptide Data",
+#' project_omic(projectname = "My Peptide Data",
 #'              datatype = "Peptide-level Label Free",
 #'              edata = pmartRdata::pep_edata,
 #'              fdata = pmartRdata::pep_fdata,
@@ -108,7 +108,7 @@ project_edata <- function(projectname, datatype, edata, edata_filename = NULL) {
 #' 
 #' }
 #' @export
-project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
+project_omic <- function(projectname, datatype, edata, fdata, emeta = NULL,
                           edata_filename = NULL, fdata_filename = NULL, emeta_filename = NULL) {
   
   # Check data type
@@ -150,27 +150,27 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
   )
   
   # Assign the class attribute
-  class(ProjectObject) <- "project pmart"
+  class(ProjectObject) <- "project omic"
   
   # Return
   return(ProjectObject)
   
 }
 
-#' Generate a project object to pass data from MAP to ipmart
+#' Generate a multi-omics project object to pass data from MAP to IPMART/MODE.
 #' 
-#' @description Constructs a project ipmart object from pmart projects and midpoints. Required. 
+#' @description Constructs a multiomics project object from omic projects or pmart midpoints. Required. 
 #' 
 #' @param projectname Any string to name the project. All spaces and non-alphanumeric
 #'    characters will be removed to prevent issues with the visualizations. Required.
-#' @param objects List of all pmart projects or all pmart midpoints at the same tab (normalization or statistics).
+#' @param objects List of all omic projects or all pmart midpoints at the same tab (normalization or statistics).
 #'    Mixing of projects and midpoints is not allowed. Must contain 2-5 objects. There can be
 #'    no more than 2 metabolomics (1 of: NMR or GC/LC-MS), no more than 2 lipidomics datasets, 
 #'    and no more than 1 proteomics (peptide or protein) dataset. Required. 
 #' @param fmeta Must be a dataframe or data table. If not provided, users can built it in 
 #'    ipmart. Default is NULL. 
 #'
-#' @return A project ipmart object
+#' @return A multiomics project object
 #' @examples 
 #' \dontrun{
 #' 
@@ -179,7 +179,7 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
 #' # Generate midpoint with the examples in midpoint_pmart and save result as "midpoint"
 #' 
 #' # Make a metabolomics GC/LC MS project
-#' metab_project <- project_pmart(projectname = "My Metab Data",
+#' metab_project <- project_omic(projectname = "My Metab Data",
 #'                                datatype = "Metabolomics-GC/LC-MS",
 #'                                edata = pmartRdata::metab_edata,
 #'                                fdata = pmartRdata::metab_fdata,
@@ -188,15 +188,15 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
 #'                           
 #'                                                     
 #' # Make a lipidomics project
-#' lipid_project <- project_pmart(projectname = "My Lipid Data",
+#' lipid_project <- project_omic(projectname = "My Lipid Data",
 #'                                datatype = "Lipidomics-Positive",
-#'                                edata = pmartRdata::lipid_edata,
-#'                                fdata = pmartRdata::lipid_fdata,
-#'                                edata_filename = "lipid_edata",
-#'                                fdata_filename = "lipid_fdata")
+#'                                edata = pmartRdata::lipid_edata_pos,
+#'                                fdata = pmartRdata::lipid_fdata_pos,
+#'                                edata_filename = "lipid_edata_pos",
+#'                                fdata_filename = "lipid_fdata_pos")
 #'                                
 #' # Make a proteomics project
-#' protein_project <- project_pmart(projectname = "My Protein Data",
+#' protein_project <- project_omic(projectname = "My Protein Data",
 #'                                 datatype = "Protein-level Label Free",
 #'                                 edata = pmartRdata::pro_edata,
 #'                                 fdata = pmartRdata::pro_fdata,
@@ -211,14 +211,14 @@ project_pmart <- function(projectname, datatype, edata, fdata, emeta = NULL,
 #' )
 #'                           
 #' # Finally, make the ipmart midpoint object
-#' project_ipmart(projectname = "projects", objects = list(metab_project, lipid_project, protein_project))
+#' project_multiomics(projectname = "projects", objects = list(metab_project, lipid_project, protein_project))
 #' 
 #' # Or use the pmart_midpoint examples 
-#' project_ipmart(projectname = "midpoints", objects = list(pep_midpoint, lipid_midpoint))                          
+#' project_multiomics(projectname = "midpoints", objects = list(pep_midpoint, lipid_midpoint))                          
 #' 
 #' }
 #' @export
-project_ipmart <- function(projectname, objects, fmeta = NULL) {
+project_multiomics <- function(projectname, objects, fmeta = NULL) {
   
   # Check the length of the object. It must be between 2 and 5.
   if (length(objects) < 2 | length(objects) > 5) {
@@ -229,12 +229,12 @@ project_ipmart <- function(projectname, objects, fmeta = NULL) {
   get_classes <- lapply(objects, class) %>% unlist()
   
   # Make sure they are all pmart projects or midpoints
-  ProjectData <- grepl("project pmart", get_classes) %>% all()
+  ProjectData <- grepl("project omic", get_classes) %>% all()
   MidpointData <- grepl("midpoint pmart", get_classes) %>% all()
   
   # If both are FALSE, trigger a warning
   if (ProjectData == FALSE & MidpointData == FALSE) {
-    stop("objects must be either all project_pmart objects or midpoint_pmart objects.")
+    stop("objects must be either all project omic objects or midpoint pmart objects.")
   }
   
   # Check the f_meta object - will be added later 
@@ -259,7 +259,7 @@ project_ipmart <- function(projectname, objects, fmeta = NULL) {
     # Extract the object type
     if (class(object) == "midpoint pmart") {
       DataType <- object$Tracking$`Original Files`$Project$DataType
-    } else if (class(object) == "project pmart") {
+    } else if (class(object) == "project omic") {
       DataType <- object$Project$DataType
     }
     
@@ -293,7 +293,7 @@ project_ipmart <- function(projectname, objects, fmeta = NULL) {
     ProjectObject <- list(
       "Project" = list(
         "Name" = .scrub_clean(projectname),
-        "DataType" = "project pmart"
+        "DataType" = "project omic"
       ),
       "Objects" = objects,
       "fmeta" = fmeta
@@ -330,7 +330,7 @@ project_ipmart <- function(projectname, objects, fmeta = NULL) {
   }
   
   # Give the object its appropriate class
-  class(ProjectObject) <- "project ipmart"
+  class(ProjectObject) <- "project multiomics"
   
   # Return result
   return(ProjectObject)

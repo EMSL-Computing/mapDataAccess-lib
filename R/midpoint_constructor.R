@@ -7,7 +7,7 @@
 #' @param tab The pmart tab the data was exported from. Acceptable entries are 
 #'    "normalization_tab", "peptide_statistics_tab", "protein_rollup_tab",
 #'    and "statistics_tab". Required. 
-#' @param project A project pmart object. Required. 
+#' @param project A project omic object. Required. 
 #' @param name A string to indicate the name of the midpoint file. Optional. 
 #' @param omics_stats An omicsStats object as defined in pmartR. Optional. 
 #' @param omics_stats_pep A peptide omicsStats object as defined in pmartR. Optional. 
@@ -41,7 +41,7 @@
 #' 
 #' pep_midpoint <- midpoint_pmart(omics_data = myPepObject,
 #'                tab = "normalization_tab", 
-#'                project = project_pmart(projectname = "My Peptide Data",
+#'                project = project_omic(projectname = "My Peptide Data",
 #'                                        datatype = "Peptide-level Label Free",
 #'                                        edata = pmartRdata::pep_edata,
 #'                                        fdata = pmartRdata::pep_fdata,
@@ -52,7 +52,7 @@
 #'                )
 #'                
 #' # Load lipidomics data 
-#' myLipidObject <- pmartRdata::lipid_object
+#' myLipidObject <- pmartRdata::lipid_object_pos
 #' 
 #' # Log transform data
 #' myLipidObject <- edata_transform(myLipidObject, "log2")
@@ -68,13 +68,13 @@
 #' 
 #' lipid_midpoint <- midpoint_pmart(omics_data = myLipidObject,
 #'                   tab = "normalization_tab", 
-#'                   project = project_pmart(projectname = "My Lipid Data",
+#'                   project = project_omic(projectname = "My Lipid Data",
 #'                                           datatype = "Lipidomics-Positive",
-#'                                           edata = pmartRdata::lipid_edata,
-#'                                           fdata = pmartRdata::lipid_fdata,
+#'                                           edata = pmartRdata::lipid_edata_pos,
+#'                                           fdata = pmartRdata::lipid_fdata_pos,
 #'                                           emeta = NULL,
-#'                                           edata_filename = "lipid_edata",
-#'                                           fdata_filename = "lipid_fdata",
+#'                                           edata_filename = "lipid_edata_pos",
+#'                                           fdata_filename = "lipid_fdata_pos",
 #'                                           emeta_filename = NULL)
 #'                )
 #' 
@@ -94,9 +94,9 @@ midpoint_pmart <- function(omics_data, tab, project = NULL, name = "exportedFrom
     stop("tab name not recognized for pmart.")
   }
   
-  # Check that project is of the project pmart class
-  if (class(project) != "project pmart") {
-    stop("project must be a project pmart object.")
+  # Check that project is of the project omic class
+  if (class(project) != "project omic") {
+    stop("project must be a project omic object.")
   }
 
   # Check that omics_stats and omics_stats_pep are statRes objects
