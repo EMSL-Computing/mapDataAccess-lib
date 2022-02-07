@@ -49,7 +49,7 @@
 pull_tags_from_object <- function(object) {
   
   # Check object class
-  if (class(object) %in% c("project edata", "project pmart", "project ipmart", "midpoint pmart", "midpoint ipmart") == FALSE) {
+  if (class(object) %in% c("project edata", "project omic", "project multiomics", "midpoint pmart", "midpoint ipmart") == FALSE) {
     stop("object class not known. Must be a project or midpoint.")
   } 
   
