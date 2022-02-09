@@ -70,14 +70,14 @@ is_fdata <- function(edata, fdata) {
   }
   
   # The number of rows in fdata must be the number of columns in edata minus 1
-  if (nrow(fdata) != ncol(edata) - 1) {
+  if (nrow(fdata) != (ncol(edata) - 1)) {
     message("The number of rows in Sample Information must match the number of columns in Expression Data minus 1.")
     return(FALSE)
   }
   
   # Make sure the column names of edata[-1] match the column values of a f_data
   ColumnNameCheck <- lapply(1:ncol(fdata), function(col) {
-    NamesToCheck <- colnames(edata)[2:ncol(edata)]
+    NamesToCheck <- colnames(edata)
     fdata[,col] %in% NamesToCheck %>% all()
   }) %>% unlist() %>% any()
   if (ColumnNameCheck == FALSE) {
