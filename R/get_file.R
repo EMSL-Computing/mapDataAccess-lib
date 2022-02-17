@@ -22,8 +22,8 @@ get_file.map_dir_connection <- function(con, id, filename = NULL, ...) {
 }
 
 #' @export
-get_file.map_minio_connection <- function(con, id, filename = NULL, ...) {
-  if (!is.null(con$directory)) {
+get_file.map_minio_connection <- function(con, id, filename = NULL, use_dir = T, ...) {
+  if (!is.null(con$directory) && use_dir) {
     id <- paste(con$directory, id, sep="/")
   }
   
