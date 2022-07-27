@@ -41,7 +41,7 @@
 #' library(pmartRdata)
 #' project_edata(projectname = "LipidToMode",
 #'              datatype = "Lipidomics-Positive",
-#'              edata = pmartRdata::lipid_edata,
+#'              edata = pmartRdata::lipid_edata_pos,
 #'              edata_filename = "lip_edata")
 #' 
 #' }
