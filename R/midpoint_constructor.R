@@ -101,12 +101,12 @@ midpoint_pmart <- function(omics_data, tab, project = NULL, name = "exportedFrom
 
   # Check that omics_stats and omics_stats_pep are statRes objects
   if (is.null(omics_stats_pep) == FALSE) {
-    if (class(omics_stats_pep) != "statRes") {
+    if (inherits(omics_stats_pep, "statRes")) {
       stop("omics_stats_pep must be a peptide statRes object from pmartR::imd_anova.")
     }
   }
   if (is.null(omics_stats) == FALSE) {
-    if (class(omics_stats) != "statRes") {
+    if (inherits(omics_stats, "statRes")) {
       stop("omics_stats must be a statRes object from pmartR::imd_anova.")
     }
   }
