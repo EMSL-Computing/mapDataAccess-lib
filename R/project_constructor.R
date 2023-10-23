@@ -164,9 +164,10 @@ project_omic <- function(projectname, datatype, edata, fdata, emeta = NULL,
 #' @param projectname Any string to name the project. All spaces and non-alphanumeric
 #'    characters will be removed to prevent issues with the visualizations. Required.
 #' @param objects List of all omic projects or all pmart midpoints at the same tab (normalization or statistics).
-#'    Mixing of projects and midpoints is not allowed. Must contain 2-5 objects. There can be
+#'    Mixing of projects and midpoints is not allowed. Must contain 2-6 objects. There can be
 #'    no more than 2 metabolomics (1 of: NMR or GC/LC-MS), no more than 2 lipidomics datasets, 
-#'    and no more than 1 proteomics (peptide or protein) dataset. Required. 
+#'    no more than 1 proteomics (peptide or protein) dataset, and no more than 1
+#'    transcriptomics dataset. Required. 
 #' @param fmeta Must be a dataframe or data table. If not provided, users can built it in 
 #'    ipmart. Default is NULL. 
 #'
