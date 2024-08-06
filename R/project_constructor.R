@@ -53,6 +53,11 @@ project_edata <- function(projectname, datatype, edata, edata_filename = NULL) {
     stop("Data Type is not of the appropriate class.")
   }
   
+  # FT-MS is not supported for edata only
+  if (datatype == "FT-MS") {
+    stop("FT-MS is not a supported datatype for expression data only.")
+  }
+  
   # Check edata 
   if (is_edata(edata) == FALSE) {
     stop("edata was not recognized as a proper edata file.")
@@ -86,8 +91,8 @@ project_edata <- function(projectname, datatype, edata, edata_filename = NULL) {
 #'    characters will be removed to prevent issues with the visualizations. Required.
 #' @param datatype Must be of the acceptable MAP omic class. See ?.is_datatype for list. Required. 
 #' @param edata Must be a dataframe or datatable. Required. 
-#' @param fdata Must be a dataframe or datatable. Required.
-#' @param emeta Must be a dataframe or datatable. Optional. 
+#' @param fdata Must be a dataframe or datatable. Required, unless the data is FT-MS where fdata is not allowed.
+#' @param emeta Must be a dataframe or datatable. Optional, unless the data is FT-MS where emeta is required 
 #' @param edata_name The path or name for the edata file. Optional. 
 #' @param fdata_name The path or name for the fdata file. Optional. 
 #' @param emeta_name The path or name for the emeta file. Optional. 
@@ -121,11 +126,24 @@ project_omic <- function(projectname, datatype, edata, fdata, emeta = NULL,
     stop("edata was not recognized as a proper edata file.")
   }
   
-  # Check fdata 
-  if (is_fdata(edata, fdata) == FALSE) {
-    stop("fdata was not recognized as a proper fdata file.")
+  # Check fdata if the datatype is not FT-MS. If it is, fdata is not allowed.
+  if (datatype != "FT-MS") {
+    if (is_fdata(edata, fdata) == FALSE) {
+      stop("fdata was not recognized as a proper fdata file.")
+    }
+  } else {
+    if (!is.null(fdata)) {
+      stop("fdata must not be provided for FT-MS data.")
+    }
   }
   
+  # Check that FT-MS has emeta
+  if (datatype == "FT-MS") {
+    if (is.null(emeta)) {
+      stop(paste("emeta is required for FT-MS."))
+    }
+  }
+
   # Check emeta (optional)
   if (is.null(emeta) == FALSE) {
     if (is_emeta(edata, emeta) == FALSE) {
